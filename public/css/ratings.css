@@ -1,0 +1,72 @@
+/* Average-rating display */
+.rating {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.rating__stars {
+  color: var(--color-warning);
+  letter-spacing: 0.08em;
+}
+
+.rating__value {
+  font-weight: var(--weight-semibold);
+}
+
+/* 1–5 star input: radio inputs inside labels */
+.star-rating {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.star-rating legend {
+  margin-bottom: var(--space-2);
+  font-weight: var(--weight-semibold);
+}
+
+.star-rating__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.star-rating__option {
+  position: relative;
+  cursor: pointer;
+}
+
+.star-rating__option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.star-rating__option span {
+  display: grid;
+  place-items: center;
+  min-width: var(--control-height);
+  min-height: var(--control-height);
+  border: 1px solid var(--color-control-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-muted);
+  font-size: 1.5rem;
+}
+
+.star-rating__option input:checked + span {
+  border-color: var(--color-warning);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.star-rating__option input:focus-visible + span {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}

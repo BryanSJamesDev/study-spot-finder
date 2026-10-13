@@ -1,0 +1,10 @@
+/* Crowd level badges */
+.status--success {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.status--warning {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
