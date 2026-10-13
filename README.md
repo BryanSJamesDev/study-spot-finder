@@ -62,7 +62,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`) stay st
 | Pages | `index.html`, `spots.html` | `ratings.html`, `checkins.html` |
 | Algorithm | KNN recommender (`ml/knn.js`) | Crowd forecast (`ml/forecast.js`) |
 | Extras | Google Maps, filters | Average rating, "crowded now" |
-| Setup | `server.js`, `db.js`, route stubs, nav | Dependencies, `.gitignore` |
+| Setup | `server.js`, `db.js`, `spots.js` stub, nav | Dependencies, `.gitignore`, `ratings.js` and `checkins.js` stubs |
 
 Ratings and check-ins store the **spot name as text**, so Bryan never depends on Eleah's code.
 
@@ -139,8 +139,10 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 - [x] **Eleah:** `db.js` with `connectDB()` and `getDB()`
 - [x] **Eleah:** `server.js` with Express, JSON, static `public` folder, connects before listening
 - [x] **Eleah:** `package.json` set to ES modules, `start` and `dev` scripts
+- [x] **Eleah:** `routes/spots.js` stub, mounted at `/api/spots` in `server.js`
 - [ ] **Bryan:** Add `.DS_Store` to `.gitignore`, remove tracked copies with `git rm --cached .DS_Store`, push
-- [ ] **Eleah:** Route stubs for all three route files, mounted in `server.js`
+- [ ] **Bryan:** Stubs in `routes/ratings.js` and `routes/checkins.js` (export `ratingsRouter` and `checkinsRouter`), push
+- [ ] **Eleah:** Mount `ratingsRouter` and `checkinsRouter` in `server.js` after Bryan's stubs are pushed
 - [ ] **Eleah:** `public/index.html` shell with nav and `shared.css`
 - [ ] **Eleah:** `tests/db.test.js` and `npm test` script
 - [ ] **Both:** Pull, run `npm run dev`, confirm "Connected" and "Server running on port 3000"
@@ -171,9 +173,9 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 
 ## What's Next
 
-**Bryan:** Fix `.DS_Store`, then pull and confirm the server runs for you. Once Eleah's route stubs are pushed, start Phase 1 on a `bryan/ratings` branch in `routes/ratings.js`.
+**Bryan:** Fix `.DS_Store`, add stubs to `routes/ratings.js` and `routes/checkins.js`, push, and tell Eleah. Then pull and confirm the server runs for you. After Eleah mounts your routes, start Phase 1 on a `bryan/ratings` branch.
 
-**Eleah:** Route stubs and mount them in `server.js`, then `index.html` shell, then `db.test.js`.
+**Eleah:** `index.html` shell, then `db.test.js`. Mount Bryan's routes once his stubs are pushed.
 
 **Both:** Settle the "To decide together" questions in the Data Model section before writing CRUD routes.
 
