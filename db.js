@@ -32,5 +32,13 @@ function getDB() {
   return db;
 }
 
+/**
+ * Closes the database.
+ */
+async function closeDB() {
+  await client.close();
+  db = null;
+}
+
 // Exports both connectDB and getDB
-export { connectDB, getDB };
+export { connectDB, getDB, closeDB };
