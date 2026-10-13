@@ -297,3 +297,45 @@ Both algorithms are written from scratch in plain JavaScript, with no external l
 4. **Show it as a bar chart,** with the busiest hour highlighted and a short written summary, like "Busiest at noon. Try 9 a.m. for a quieter start."
 
 **Why weighted:** A simple average would treat a Monday 9 a.m. check-in the same as a Friday 3 p.m. one. Weighting by closeness means the forecast reflects the real pattern for that time, while still using all the data when there aren't many check-ins yet.
+
+---
+
+## 9. Team Contributions
+
+Each teammate builds their features end to end: the page, the browser JavaScript, the API routes, and the MongoDB collection.
+
+### Eleah Burman
+
+**Features**
+- **Add and manage study spots:** the Spots page form, `routes/spots.js` with full CRUD, and the `spots` collection.
+- **Map and filters:** the Google Maps integration limited to campus, plus filtering by noise, outlets, Wi-Fi, and tags.
+- **KNN recommender:** the "spots like this" algorithm in `ml/knn.js` and its explanations.
+
+**Project setup and design**
+- Database connection module (`db.js`) and Express server (`server.js`), including mounting all three routers.
+- Figma mockups and style guide.
+- All CSS, split by module (`shared.css`, `nav.css`, and one file per page).
+- Home page and shared nav.
+- ESLint, Prettier, and MIT license setup.
+- README and this design document.
+
+### Bryan James
+
+**Features**
+- **Rate study spots:** the Ratings page, `routes/ratings.js` with full CRUD, average ratings, and the `ratings` collection.
+- **Check-ins and crowd forecast:** the Check-Ins page, `routes/checkins.js` with full CRUD, "crowded now," and the `checkins` collection.
+- **Crowd forecast algorithm:** the weighted forecast in `ml/forecast.js`.
+
+**Project setup**
+- GitHub repository and initial project setup.
+- Dependencies (`express`, `mongodb`, `dotenv`) and `.gitignore`.
+- MongoDB Atlas cluster, database users, and network access.
+- Route stubs for ratings and check-ins.
+
+### Shared
+
+- Data model decisions.
+- Seed scripts for 1,000+ records (each teammate seeds their own collections).
+- Deployment.
+- Code review through pull requests.
+- Demo video and presentation.
