@@ -23,15 +23,15 @@ app.use("/api/ratings", ratingsRouter);
 app.use("/api/checkins", checkinsRouter);
 // Connect DB
 async function startServer() {
-    try {
-        await connectDB();
-        app.listen(PORT, () =>{
-            console.log(`Server running on port ${PORT}`);
-        });
-    } catch (error) {
-        console.error("Failed to start server:", error);
-        process.exit(1);
-    }
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 }
 
 // Call startServer

@@ -68,7 +68,9 @@ body {
   line-height: var(--line-body);
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   margin: 0 0 var(--space-4);
   font-family: var(--font-heading);
   font-weight: var(--weight-bold);
@@ -76,24 +78,44 @@ h1, h2, h3 {
   overflow-wrap: anywhere;
 }
 
-h1 { font-size: var(--text-h1); }
-h2 { font-size: var(--text-h2); }
-h3 { font-size: var(--text-h3); }
+h1 {
+  font-size: var(--text-h1);
+}
+h2 {
+  font-size: var(--text-h2);
+}
+h3 {
+  font-size: var(--text-h3);
+}
 
-p { margin: 0 0 var(--space-4); }
-small, .text-small { font-size: var(--text-small); }
-.text-muted { color: var(--color-muted); }
+p {
+  margin: 0 0 var(--space-4);
+}
+small,
+.text-small {
+  font-size: var(--text-small);
+}
+.text-muted {
+  color: var(--color-muted);
+}
 
 a {
   color: var(--color-primary);
   text-underline-offset: 0.2em;
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font: inherit;
 }
 
-button, a, input, select, textarea {
+button,
+a,
+input,
+select,
+textarea {
   touch-action: manipulation;
 }
 
@@ -170,7 +192,9 @@ main {
   font-weight: var(--weight-semibold);
 }
 
-.input, .select, .textarea {
+.input,
+.select,
+.textarea {
   width: 100%;
   min-width: 0;
   min-height: var(--control-height);
@@ -196,13 +220,18 @@ main {
   border-color: var(--color-error);
 }
 
-.field__hint, .field__error {
+.field__hint,
+.field__error {
   margin: 0;
   font-size: var(--text-small);
 }
 
-.field__hint { color: var(--color-muted); }
-.field__error { color: var(--color-error); }
+.field__hint {
+  color: var(--color-muted);
+}
+.field__error {
+  color: var(--color-error);
+}
 
 /* Cards and panels */
 .card {
@@ -267,7 +296,8 @@ main {
     --text-h2: 1.5rem;
   }
 
-  .card, .panel {
+  .card,
+  .panel {
     padding: var(--space-4);
   }
 

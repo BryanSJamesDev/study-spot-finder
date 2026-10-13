@@ -55,15 +55,15 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
 
 ## Who Owns What
 
-| Area | Eleah | Bryan |
-|------|-------|-------|
-| Collections | `spots` | `ratings`, `checkins` |
-| Routes | `/api/spots` | `/api/ratings`, `/api/checkins` |
-| Pages | `index.html`, `spots.html` | `ratings.html`, `checkins.html` |
-| Algorithm | KNN recommender (`ml/knn.js`) | Crowd forecast (`ml/forecast.js`) |
-| Extras | Google Maps, filters | Average rating, "crowded now" |
-| Styles | `shared.css` (all pages) | Uses classes from `shared.css` |
-| Setup | `server.js`, `db.js`, `spots.js` stub, nav | Dependencies, `.gitignore`, `ratings.js` and `checkins.js` stubs |
+| Area        | Eleah                                      | Bryan                                                            |
+| ----------- | ------------------------------------------ | ---------------------------------------------------------------- |
+| Collections | `spots`                                    | `ratings`, `checkins`                                            |
+| Routes      | `/api/spots`                               | `/api/ratings`, `/api/checkins`                                  |
+| Pages       | `index.html`, `spots.html`                 | `ratings.html`, `checkins.html`                                  |
+| Algorithm   | KNN recommender (`ml/knn.js`)              | Crowd forecast (`ml/forecast.js`)                                |
+| Extras      | Google Maps, filters                       | Average rating, "crowded now"                                    |
+| Styles      | `shared.css` (all pages)                   | Uses classes from `shared.css`                                   |
+| Setup       | `server.js`, `db.js`, `spots.js` stub, nav | Dependencies, `.gitignore`, `ratings.js` and `checkins.js` stubs |
 
 Ratings and check-ins store the **spot name as text**, so Bryan never depends on Eleah's code.
 
@@ -85,18 +85,18 @@ Every page links `css/shared.css` and uses the same nav. To start a new page, co
 
 Common classes:
 
-| Class | Use |
-|-------|-----|
-| `container` | Centers content and sets max width (use on `<main>`) |
-| `card`, `card__header`, `card__title`, `card__meta`, `card__actions` | Spot cards and info boxes |
-| `panel` | Larger sections like forms and charts |
-| `btn btn--primary`, `btn btn--secondary` | Buttons |
-| `form`, `field`, `field__label`, `input`, `select`, `textarea` | Forms |
-| `field__hint`, `field__error` | Help text and error messages under inputs |
-| `tag`, `chip` | Static tags and clickable filter chips |
-| `status--success`, `status--warning` | Badges like "Not busy" or "Moderate" |
-| `rating`, `star-rating` | Average rating display and 1 to 5 star input |
-| `spot-grid`, `spots-layout`, `map` | Spots page layout and map |
+| Class                                                                | Use                                                  |
+| -------------------------------------------------------------------- | ---------------------------------------------------- |
+| `container`                                                          | Centers content and sets max width (use on `<main>`) |
+| `card`, `card__header`, `card__title`, `card__meta`, `card__actions` | Spot cards and info boxes                            |
+| `panel`                                                              | Larger sections like forms and charts                |
+| `btn btn--primary`, `btn btn--secondary`                             | Buttons                                              |
+| `form`, `field`, `field__label`, `input`, `select`, `textarea`       | Forms                                                |
+| `field__hint`, `field__error`                                        | Help text and error messages under inputs            |
+| `tag`, `chip`                                                        | Static tags and clickable filter chips               |
+| `status--success`, `status--warning`                                 | Badges like "Not busy" or "Moderate"                 |
+| `rating`, `star-rating`                                              | Average rating display and 1 to 5 star input         |
+| `spot-grid`, `spots-layout`, `map`                                   | Spots page layout and map                            |
 
 Colors, fonts, and spacing are CSS variables in `:root` (for example `var(--color-primary)` or `var(--space-4)`). Use those instead of hex codes.
 
@@ -135,13 +135,14 @@ Each person makes their own `.env` file in the project root. It's gitignored and
 
 Agree on these before building routes. Ratings and check-ins reference spots by **name**, so spot names must be unique.
 
-| Collection | Fields |
-|------------|--------|
-| `spots` | `name` (unique), `noiseLevel`, `outlets` (true/false), `wifi` (true/false), `closingTime`, `tags` (array), `lat`, `lng` |
-| `ratings` | `spotName`, `stars` (1 to 5), `createdAt` |
-| `checkins` | `spotName`, `crowdLevel`, `day`, `hour`, `note` (optional), `createdAt` |
+| Collection | Fields                                                                                                                  |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `spots`    | `name` (unique), `noiseLevel`, `outlets` (true/false), `wifi` (true/false), `closingTime`, `tags` (array), `lat`, `lng` |
+| `ratings`  | `spotName`, `stars` (1 to 5), `createdAt`                                                                               |
+| `checkins` | `spotName`, `crowdLevel`, `day`, `hour`, `note` (optional), `createdAt`                                                 |
 
 **To decide together:**
+
 - What scale is `noiseLevel` (e.g. 1 to 3, or "quiet / moderate / loud")?
 - What scale is `crowdLevel`? The Figma design uses "Not busy / Moderate / Very busy."
 - The Figma design adds a `building` / location field on spots and an optional written `review` on ratings. Add them?
@@ -161,6 +162,7 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 ## Roadmap
 
 ### Phase 0: Setup
+
 - [x] **Bryan:** `npm init`, install dependencies (`express`, `mongodb`, `dotenv`), `.gitignore`, push to `main`
 - [x] **Eleah:** `db.js` with `connectDB()` and `getDB()`
 - [x] **Eleah:** `server.js` with Express, JSON, static `public` folder, connects before listening
@@ -175,6 +177,7 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 - [ ] **Both:** Pull, run `npm run dev`, confirm "Connected" and "Server running on port 3000"
 
 ### Phase 1: Backend
+
 - [ ] **Both:** Agree on the data model above and the API response format
 - [ ] **Eleah:** `spots` CRUD routes in `routes/spots.js`
 - [ ] **Bryan:** `ratings` CRUD routes and average rating in `routes/ratings.js`
@@ -182,15 +185,18 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 - [ ] **Both:** Route tests for your own routes (success, invalid input, missing records)
 
 ### Phase 2: Frontend
+
 - [ ] **Eleah:** `spots.html` with add, edit, delete form and filters
 - [ ] **Bryan:** `ratings.html` with star rating UI
 - [ ] **Bryan:** `checkins.html` with check-in form
 
 ### Phase 3: Algorithms
+
 - [ ] **Eleah:** KNN recommender in `ml/knn.js` with explanations, plus tests
 - [ ] **Bryan:** Weighted forecast in `ml/forecast.js`, plus tests
 
 ### Phase 4: Map and Polish
+
 - [ ] **Eleah:** Google Map limited to campus bounds
 - [ ] **Both:** Seed data for own collections
 - [ ] **Eleah:** Final styling pass in `shared.css`

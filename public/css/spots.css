@@ -5,7 +5,8 @@
   gap: var(--space-4);
 }
 
-.card__tags, .filters {
+.card__tags,
+.filters {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
