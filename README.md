@@ -94,7 +94,7 @@ Ratings and check-ins store the **spot name as text**, so Bryan never depends on
 
 Each person makes their own `.env` file in the project root. It's gitignored and never pushed.
 
-    MONGO_URI=mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@cluster0.ezsdfny.mongodb.net/?appName=Cluster0
+    MONGO_URI=
     PORT=3000
     GOOGLE_MAPS_KEY=
 
