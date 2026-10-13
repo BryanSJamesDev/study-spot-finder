@@ -6,6 +6,7 @@ Find study spots on Northeastern's campus that match how you study.
 **Class:** [CS5610 Web Development](CLASS_LINK_HERE), Northeastern University
 **Stack:** Node.js, Express, Vanilla ES6, MongoDB (Node driver), Google Maps JS API
 **Design:** [Figma file](https://www.figma.com/design/gAZKaGijIlob4iAr49KcYV/Untitled)
+**Design document:** [docs/design-document.md](docs/design-document.md)
 **Deployed site:** _coming soon_
 **Demo video:** _coming soon_
 
@@ -38,6 +39,10 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     ├── .gitignore             # Bryan
     ├── LICENSE                # MIT (done)
     ├── README.md              # Both (see rules below)
+    ├── docs/
+    │   ├── design-document.md # Eleah (project description, personas, stories, mockups)
+    │   └── images/
+    │       └── mockups.png
     ├── routes/
     │   ├── spots.js           # Eleah
     │   ├── ratings.js         # Bryan
@@ -214,6 +219,7 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 
 ## Rubric Checklist
 
+- [x] Design document as a separate file, linked from this README
 - [x] Node + Express backend
 - [x] ES modules only (no `require()`)
 - [x] MIT license
