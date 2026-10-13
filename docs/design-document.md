@@ -255,3 +255,45 @@ Ratings and check-ins store the spot's name as text instead of its MongoDB `_id`
 ### Test data
 
 The project needs more than 1,000 database records. Each teammate writes a seed script in `seed/` that generates realistic sample data for their own collections, so the database can be filled or reset with one command.
+
+---
+
+## 8. Algorithms
+
+Both algorithms are written from scratch in plain JavaScript, with no external libraries.
+
+### KNN recommender: "Spots like this" (Eleah)
+
+**Goal:** When a student looks at a spot, show the few spots most similar to it, and explain why each one matched.
+
+**How it works:**
+
+1. **Turn each spot into numbers.** Every spot becomes a list of features the algorithm can compare:
+   - Noise level as a number (for example, Quiet = 0, Moderate = 0.5, Loud = 1)
+   - Outlets: 1 if available, 0 if not
+   - Wi-Fi: 1 if available, 0 if not
+   - Tags: how much the two spots' tags overlap, from 0 (no shared tags) to 1 (identical tags)
+2. **Measure the distance.** For the chosen spot, the algorithm calculates how far every other spot is, feature by feature. A smaller distance means a more similar spot.
+3. **Pick the k closest.** The algorithm sorts the spots by distance and keeps the closest few (planned: k = 3).
+4. **Explain the match.** For each recommended spot, the app lists the features it shares with the chosen spot, such as "Same noise level · Outlets · 2 shared tags."
+
+**Example:** A student is looking at a quiet spot with outlets, Wi-Fi, and the tag "quiet zone." Another quiet spot with outlets and Wi-Fi, also tagged "quiet zone," has a distance close to 0, so it ranks first. A loud spot with no outlets ranks last.
+
+### Crowded now (Bryan)
+
+**Goal:** Show how busy a spot is right now.
+
+**How it works:** The app looks at check-ins for that spot from the last 2 hours, turns each crowd level into a number (Not busy = 1, Moderate = 2, Very busy = 3), and averages them. If there are no recent check-ins, the app says so instead of guessing.
+
+### Crowd forecast (Bryan)
+
+**Goal:** For a chosen spot and day, predict how busy it will be at each hour.
+
+**How it works:**
+
+1. **Gather past check-ins** for the chosen spot.
+2. **Weight each check-in by how close it is** to the day and hour being predicted. A check-in from the same day at the same hour counts the most. Check-ins from a different day, or a few hours away, still count, just less.
+3. **Take the weighted average** of the crowd levels for each hour. This gives a predicted crowd level for every hour of that day.
+4. **Show it as a bar chart,** with the busiest hour highlighted and a short written summary, like "Busiest at noon. Try 9 a.m. for a quieter start."
+
+**Why weighted:** A simple average would treat a Monday 9 a.m. check-in the same as a Friday 3 p.m. one. Weighting by closeness means the forecast reflects the real pattern for that time, while still using all the data when there aren't many check-ins yet.
