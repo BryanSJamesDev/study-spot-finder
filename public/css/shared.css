@@ -133,6 +133,12 @@ main {
   text-decoration: none;
 }
 
+.nav__brand small {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: var(--weight-normal);
+}
+
 .nav__links {
   display: flex;
   flex-wrap: wrap;
