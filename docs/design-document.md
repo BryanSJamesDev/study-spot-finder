@@ -83,3 +83,35 @@ Jordan's group met at the student center for their project. The tables were big 
 > As a student, I want to submit, edit, and delete a check-in that reports how crowded a spot is, see how crowded it is right now, and see how busy it's predicted to be at each hour, so that I can avoid crowded times.
 
 Jordan needs to book a group session for Thursday. On the Check-Ins page, he picks a spot and Thursday, and the hourly forecast shows it's busiest at noon and quieter at 9 a.m. He schedules the session for the morning. On Thursday, when the group arrives, he submits a quick check-in: "Not busy," with a note that the big tables by the window are open. Maya, checking the app across campus, sees that it's not crowded right now and decides to head over too.
+
+---
+
+## 4. Design Mockups
+
+Mockups were designed in Figma for both desktop and mobile. [View the full Figma file](https://www.figma.com/design/gAZKaGijIlob4iAr49KcYV/Untitled).
+
+![Study Spot Finder mockups: style guide and all four pages on desktop and mobile](images/mockups.png)
+
+### Style guide
+
+Defines the color tokens, typography, spacing scale, and shared components (nav, cards, buttons, form inputs, tags, and star rating) used on every page. These map directly to the CSS variables in `public/css/shared.css`.
+
+### Home
+
+Introduces the app with a short headline and two main actions: "Explore study spots" and "Report a crowd level." Below that, a few featured spot cards and a three-step summary of what students can do: find a spot, rate it, and check in.
+
+### Spots
+
+The main page for finding a spot. A search bar and filter chips (noise, outlets, Wi-Fi, tags) sit above a map and a list of matching spot cards. Each card shows the spot's rating, tags, and current crowd level. The "Add or edit a study spot" form sits at the bottom of the page.
+
+### Ratings
+
+Shows the top-rated spots with their average ratings. A form lets students pick a spot, choose 1 to 5 stars, and leave an optional review. Recent reviews appear next to the form.
+
+### Check-Ins
+
+A form for reporting how crowded a spot is (Not busy, Moderate, or Very busy) with an optional note. Next to it, an hourly bar chart shows the crowd forecast for a chosen spot. Recent check-ins appear below.
+
+### Mobile
+
+On narrow screens, the nav wraps into a grid, and side-by-side sections (like the map and spot list, or the form and forecast) stack into a single column. Buttons and nav links stay at least 44px tall so they're easy to tap.
