@@ -115,3 +115,35 @@ A form for reporting how crowded a spot is (Not busy, Moderate, or Very busy) wi
 ### Mobile
 
 On narrow screens, the nav wraps into a grid, and side-by-side sections (like the map and spot list, or the form and forecast) stack into a single column. Buttons and nav links stay at least 44px tall so they're easy to tap.
+
+---
+
+## 5. Design Decisions
+
+### Visual style
+
+- **Northeastern red.** The primary color (`#b42332`) nods to Northeastern's school colors, but it's used sparingly, only for main buttons, the active nav link, and highlights. Most of the page is white cards on a light gray background, so the information stays the focus.
+- **Two fonts.** Manrope for headings gives the app a friendly, modern feel. Source Sans 3 for body text is easy to read at small sizes, which matters for spot details and form labels.
+- **Cards for scanning.** Each spot is a card with the same layout: name, location, rating, tags, and crowd level. Students can compare spots at a glance without reading paragraphs.
+- **Design tokens.** All colors, font sizes, spacing, and corner radii are CSS variables in `shared.css`. This keeps every page consistent and makes changes easy, since one variable updates the whole app.
+
+### Accessibility
+
+- **Color contrast.** Text and background colors meet WCAG AA contrast so the app is readable for students with low vision.
+- **Color is never the only signal.** Crowd levels always show text ("Not busy," "Moderate") along with a color, and star ratings show the number (for example, "4.6 / 5").
+- **Standard HTML elements.** Buttons are `<button>`, forms use `<form>` and `<label>`, and the nav uses `<nav>`. This makes the app work with keyboards and screen readers by default.
+- **Visible focus.** Every interactive element shows a clear outline when focused with the keyboard.
+- **Large tap targets.** Buttons, nav links, and filter chips are at least 44px tall, so they're easy to tap on a phone.
+- **ARIA where it helps.** `aria-current="page"` marks the active nav link, and `aria-pressed` shows which filter chips are on.
+
+### Layout and responsiveness
+
+- **Mobile first in mind.** Students often check for a study spot on their phone while walking across campus. On small screens, the nav wraps into a grid and two-column sections stack into one column.
+- **Map next to the list.** On desktop, the map and spot list sit side by side so students can connect a pin to its details. On mobile, the map comes first, then the list.
+
+### Product decisions
+
+- **Students add the data.** Spots, ratings, and check-ins all come from students, so the information stays current without anyone maintaining it.
+- **Simple crowd levels.** Three levels (Not busy, Moderate, Very busy) are quick to report in a few seconds. More options would make check-ins slower and less likely to happen.
+- **Explain recommendations.** The "spots like this" list says *why* each spot matched, so students can trust the suggestion instead of guessing.
+- **Simulated users.** The professor confirmed a full login system isn't needed for this project, so the app focuses on the study spot features instead of authentication.
