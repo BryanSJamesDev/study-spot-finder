@@ -55,7 +55,7 @@ The app turns scattered, word-of-mouth knowledge into shared, searchable informa
 - **Habits:** Studies between classes in whatever building she's already in. Likes natural light and a calm, but not silent, atmosphere.
 - **Frustrations:** Only knows the main library. Doesn't know which other buildings have good spaces or where they are.
 - **What she needs from the app:** The campus map to discover spots near her, and "spots like this" recommendations to find new places similar to one she already likes.
-  
+
 ---
 
 ## 3. User Stories
@@ -145,22 +145,22 @@ On narrow screens, the nav wraps into a grid, and side-by-side sections (like th
 
 - **Students add the data.** Spots, ratings, and check-ins all come from students, so the information stays current without anyone maintaining it.
 - **Simple crowd levels.** Three levels (Not busy, Moderate, Very busy) are quick to report in a few seconds. More options would make check-ins slower and less likely to happen.
-- **Explain recommendations.** The "spots like this" list says *why* each spot matched, so students can trust the suggestion instead of guessing.
+- **Explain recommendations.** The "spots like this" list says _why_ each spot matched, so students can trust the suggestion instead of guessing.
 - **Simulated users.** The professor confirmed a full login system isn't needed for this project, so the app focuses on the study spot features instead of authentication.
-  
+
 ---
 
 ## 6. Architecture
 
 ### Stack
 
-| Layer | Technology |
-|-------|------------|
+| Layer    | Technology                                                    |
+| -------- | ------------------------------------------------------------- |
 | Frontend | HTML5, CSS (split by module), vanilla JavaScript (ES modules) |
-| Backend | Node.js and Express |
-| Database | MongoDB Atlas, using the official MongoDB Node.js driver |
-| Map | Google Maps JavaScript API |
-| Tooling | ESLint, Prettier, Node's built-in test runner |
+| Backend  | Node.js and Express                                           |
+| Database | MongoDB Atlas, using the official MongoDB Node.js driver      |
+| Map      | Google Maps JavaScript API                                    |
+| Tooling  | ESLint, Prettier, Node's built-in test runner                 |
 
 The project does not use React, Mongoose, template engines, or server-side rendering. All JavaScript uses ES modules (`import`/`export`), never `require()`.
 
@@ -193,17 +193,17 @@ The app uses three MongoDB collections. Each one supports full CRUD (create, rea
 
 ### `spots` (Eleah)
 
-| Field | Type | Notes |
-|-------|------|-------|
-| `_id` | ObjectId | Created by MongoDB |
-| `name` | String | Required, unique |
-| `noiseLevel` | String | Scale to be finalized (e.g. Quiet, Moderate, Loud) |
-| `outlets` | Boolean | Are outlets available? |
-| `wifi` | Boolean | Is Wi-Fi available? |
-| `closingTime` | String | For example, "22:00" |
-| `tags` | Array of strings | For example, `["group study", "natural light"]` |
-| `lat` | Number | Latitude, limited to Northeastern's campus |
-| `lng` | Number | Longitude, limited to Northeastern's campus |
+| Field         | Type             | Notes                                              |
+| ------------- | ---------------- | -------------------------------------------------- |
+| `_id`         | ObjectId         | Created by MongoDB                                 |
+| `name`        | String           | Required, unique                                   |
+| `noiseLevel`  | String           | Scale to be finalized (e.g. Quiet, Moderate, Loud) |
+| `outlets`     | Boolean          | Are outlets available?                             |
+| `wifi`        | Boolean          | Is Wi-Fi available?                                |
+| `closingTime` | String           | For example, "22:00"                               |
+| `tags`        | Array of strings | For example, `["group study", "natural light"]`    |
+| `lat`         | Number           | Latitude, limited to Northeastern's campus         |
+| `lng`         | Number           | Longitude, limited to Northeastern's campus        |
 
 Example:
 
@@ -222,24 +222,24 @@ Example:
 
 ### `ratings` (Bryan)
 
-| Field | Type | Notes |
-|-------|------|-------|
-| `_id` | ObjectId | Created by MongoDB |
-| `spotName` | String | Required, matches a spot's `name` |
-| `stars` | Number | Required, whole number from 1 to 5 |
-| `createdAt` | Date | When the rating was submitted |
+| Field       | Type     | Notes                              |
+| ----------- | -------- | ---------------------------------- |
+| `_id`       | ObjectId | Created by MongoDB                 |
+| `spotName`  | String   | Required, matches a spot's `name`  |
+| `stars`     | Number   | Required, whole number from 1 to 5 |
+| `createdAt` | Date     | When the rating was submitted      |
 
 ### `checkins` (Bryan)
 
-| Field | Type | Notes |
-|-------|------|-------|
-| `_id` | ObjectId | Created by MongoDB |
-| `spotName` | String | Required, matches a spot's `name` |
-| `crowdLevel` | String | Not busy, Moderate, or Very busy |
-| `day` | String | Day of the week, used by the forecast |
-| `hour` | Number | Hour of the day (0 to 23), used by the forecast |
-| `note` | String | Optional |
-| `createdAt` | Date | Used for "crowded now" (last 2 hours) |
+| Field        | Type     | Notes                                           |
+| ------------ | -------- | ----------------------------------------------- |
+| `_id`        | ObjectId | Created by MongoDB                              |
+| `spotName`   | String   | Required, matches a spot's `name`               |
+| `crowdLevel` | String   | Not busy, Moderate, or Very busy                |
+| `day`        | String   | Day of the week, used by the forecast           |
+| `hour`       | Number   | Hour of the day (0 to 23), used by the forecast |
+| `note`       | String   | Optional                                        |
+| `createdAt`  | Date     | Used for "crowded now" (last 2 hours)           |
 
 ### Why reference spots by name?
 
@@ -307,11 +307,13 @@ Each teammate builds their features end to end: the page, the browser JavaScript
 ### Eleah Burman
 
 **Features**
+
 - **Add and manage study spots:** the Spots page form, `routes/spots.js` with full CRUD, and the `spots` collection.
 - **Map and filters:** the Google Maps integration limited to campus, plus filtering by noise, outlets, Wi-Fi, and tags.
 - **KNN recommender:** the "spots like this" algorithm in `ml/knn.js` and its explanations.
 
 **Project setup and design**
+
 - Database connection module (`db.js`) and Express server (`server.js`), including mounting all three routers.
 - Figma mockups and style guide.
 - All CSS, split by module (`shared.css`, `nav.css`, and one file per page).
@@ -322,11 +324,13 @@ Each teammate builds their features end to end: the page, the browser JavaScript
 ### Bryan James
 
 **Features**
+
 - **Rate study spots:** the Ratings page, `routes/ratings.js` with full CRUD, average ratings, and the `ratings` collection.
 - **Check-ins and crowd forecast:** the Check-Ins page, `routes/checkins.js` with full CRUD, "crowded now," and the `checkins` collection.
 - **Crowd forecast algorithm:** the weighted forecast in `ml/forecast.js`.
 
 **Project setup**
+
 - GitHub repository and initial project setup.
 - Dependencies (`express`, `mongodb`, `dotenv`) and `.gitignore`.
 - MongoDB Atlas cluster, database users, and network access.

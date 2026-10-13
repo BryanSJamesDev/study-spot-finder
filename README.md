@@ -76,15 +76,15 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
 
 ## Who Owns What
 
-| Area | Eleah | Bryan |
-|------|-------|-------|
-| Collections | `spots` | `ratings`, `checkins` |
-| Routes | `/api/spots` | `/api/ratings`, `/api/checkins` |
-| Pages | `index.html`, `spots.html` | `ratings.html`, `checkins.html` |
-| Algorithm | KNN recommender (`ml/knn.js`) | Crowd forecast (`ml/forecast.js`) |
-| Extras | Google Maps, filters | Average rating, "crowded now" |
-| Styles | All CSS files | Uses classes from the CSS files |
-| Setup | `server.js`, `db.js`, route mounting, nav, license, Prettier/ESLint | Dependencies, `.gitignore`, `ratings.js` and `checkins.js` stubs |
+| Area        | Eleah                                                               | Bryan                                                            |
+| ----------- | ------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Collections | `spots`                                                             | `ratings`, `checkins`                                            |
+| Routes      | `/api/spots`                                                        | `/api/ratings`, `/api/checkins`                                  |
+| Pages       | `index.html`, `spots.html`                                          | `ratings.html`, `checkins.html`                                  |
+| Algorithm   | KNN recommender (`ml/knn.js`)                                       | Crowd forecast (`ml/forecast.js`)                                |
+| Extras      | Google Maps, filters                                                | Average rating, "crowded now"                                    |
+| Styles      | All CSS files                                                       | Uses classes from the CSS files                                  |
+| Setup       | `server.js`, `db.js`, route mounting, nav, license, Prettier/ESLint | Dependencies, `.gitignore`, `ratings.js` and `checkins.js` stubs |
 
 Ratings and check-ins store the **spot name as text**, so Bryan never depends on Eleah's code.
 
@@ -104,29 +104,29 @@ Ratings and check-ins store the **spot name as text**, so Bryan never depends on
 
 CSS is split into modules. Every page links `shared.css` and `nav.css`, plus its own file:
 
-| Page | CSS files |
-|------|-----------|
-| `index.html` | `shared.css`, `nav.css` |
-| `spots.html` | `shared.css`, `nav.css`, `spots.css` |
-| `ratings.html` | `shared.css`, `nav.css`, `ratings.css` |
+| Page            | CSS files                               |
+| --------------- | --------------------------------------- |
+| `index.html`    | `shared.css`, `nav.css`                 |
+| `spots.html`    | `shared.css`, `nav.css`, `spots.css`    |
+| `ratings.html`  | `shared.css`, `nav.css`, `ratings.css`  |
 | `checkins.html` | `shared.css`, `nav.css`, `checkins.css` |
 
 To start a new page, copy the `<head>` and `<nav>` from `index.html`, add the page's own CSS link, and move `aria-current="page"` to that page's nav link.
 
 Common classes:
 
-| Class | File | Use |
-|-------|------|-----|
-| `container` | shared | Centers content and sets max width (use on `<main>`) |
-| `card`, `card__header`, `card__title`, `card__meta`, `card__actions` | shared | Cards and info boxes |
-| `panel` | shared | Larger sections like forms and charts |
-| `btn btn--primary`, `btn btn--secondary` | shared | Buttons |
-| `form`, `field`, `field__label`, `input`, `select`, `textarea` | shared | Forms |
-| `field__hint`, `field__error` | shared | Help text and error messages under inputs |
-| `tag` | shared | Static tags |
-| `spot-grid`, `spots-layout`, `map`, `chip`, `filters`, `card__tags` | spots | Spots page layout, map, and filter chips |
-| `rating`, `star-rating` | ratings | Average rating display and 1 to 5 star input |
-| `status--success`, `status--warning` | checkins | Crowd badges like "Not busy" or "Moderate" |
+| Class                                                                | File     | Use                                                  |
+| -------------------------------------------------------------------- | -------- | ---------------------------------------------------- |
+| `container`                                                          | shared   | Centers content and sets max width (use on `<main>`) |
+| `card`, `card__header`, `card__title`, `card__meta`, `card__actions` | shared   | Cards and info boxes                                 |
+| `panel`                                                              | shared   | Larger sections like forms and charts                |
+| `btn btn--primary`, `btn btn--secondary`                             | shared   | Buttons                                              |
+| `form`, `field`, `field__label`, `input`, `select`, `textarea`       | shared   | Forms                                                |
+| `field__hint`, `field__error`                                        | shared   | Help text and error messages under inputs            |
+| `tag`                                                                | shared   | Static tags                                          |
+| `spot-grid`, `spots-layout`, `map`, `chip`, `filters`, `card__tags`  | spots    | Spots page layout, map, and filter chips             |
+| `rating`, `star-rating`                                              | ratings  | Average rating display and 1 to 5 star input         |
+| `status--success`, `status--warning`                                 | checkins | Crowd badges like "Not busy" or "Moderate"           |
 
 Colors, fonts, and spacing are CSS variables in `:root` in `shared.css` (for example `var(--color-primary)` or `var(--space-4)`). Use those instead of hex codes.
 
@@ -147,14 +147,14 @@ Colors, fonts, and spacing are CSS variables in `:root` in `shared.css` (for exa
 
 ## Scripts
 
-| Command | What it does |
-|---------|--------------|
-| `npm run dev` | Starts the server and restarts on save |
-| `npm start` | Starts the server (used for deployment) |
-| `npm run lint` | Checks for code errors with ESLint |
-| `npm run format` | Formats all files with Prettier |
-| `npm run format:check` | Checks formatting without changing files |
-| `npm test` | Runs tests with Node's built-in test runner |
+| Command                | What it does                                |
+| ---------------------- | ------------------------------------------- |
+| `npm run dev`          | Starts the server and restarts on save      |
+| `npm start`            | Starts the server (used for deployment)     |
+| `npm run lint`         | Checks for code errors with ESLint          |
+| `npm run format`       | Formats all files with Prettier             |
+| `npm run format:check` | Checks formatting without changing files    |
+| `npm test`             | Runs tests with Node's built-in test runner |
 
 ES modules only: use `import` and `export`, never `require()`.
 
@@ -181,13 +181,14 @@ Each person makes their own `.env` file in the project root. It's gitignored and
 
 Agree on these before building routes. Ratings and check-ins reference spots by **name**, so spot names must be unique. **All three collections need full CRUD** (create, read, update, delete).
 
-| Collection | Fields |
-|------------|--------|
-| `spots` | `name` (unique), `noiseLevel`, `outlets` (true/false), `wifi` (true/false), `closingTime`, `tags` (array), `lat`, `lng` |
-| `ratings` | `spotName`, `stars` (1 to 5), `createdAt` |
-| `checkins` | `spotName`, `crowdLevel`, `day`, `hour`, `note` (optional), `createdAt` |
+| Collection | Fields                                                                                                                  |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `spots`    | `name` (unique), `noiseLevel`, `outlets` (true/false), `wifi` (true/false), `closingTime`, `tags` (array), `lat`, `lng` |
+| `ratings`  | `spotName`, `stars` (1 to 5), `createdAt`                                                                               |
+| `checkins` | `spotName`, `crowdLevel`, `day`, `hour`, `note` (optional), `createdAt`                                                 |
 
 **To decide together:**
+
 - What scale is `noiseLevel` (e.g. 1 to 3, or "quiet / moderate / loud")?
 - What scale is `crowdLevel`? The Figma design uses "Not busy / Moderate / Very busy."
 - The Figma design adds a `building` / location field on spots and an optional written `review` on ratings. Add them?
@@ -198,13 +199,13 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 
 ## API Endpoints (planned)
 
-| Method | Endpoint | Owner |
-|--------|----------|-------|
-| GET, POST | `/api/spots` | Eleah |
-| GET, PUT, DELETE | `/api/spots/:id` | Eleah |
-| GET, POST | `/api/ratings` | Bryan |
-| GET, PUT, DELETE | `/api/ratings/:id` | Bryan |
-| GET, POST | `/api/checkins` | Bryan |
+| Method           | Endpoint            | Owner |
+| ---------------- | ------------------- | ----- |
+| GET, POST        | `/api/spots`        | Eleah |
+| GET, PUT, DELETE | `/api/spots/:id`    | Eleah |
+| GET, POST        | `/api/ratings`      | Bryan |
+| GET, PUT, DELETE | `/api/ratings/:id`  | Bryan |
+| GET, POST        | `/api/checkins`     | Bryan |
 | GET, PUT, DELETE | `/api/checkins/:id` | Bryan |
 
 ---
@@ -243,6 +244,7 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 Must-haves come first. The map and algorithms come after the core app is deployed and working.
 
 ### Phase 0: Setup (done)
+
 - [x] **Bryan:** `npm init`, install dependencies (`express`, `mongodb`, `dotenv`), `.gitignore`, push to `main`
 - [x] **Bryan:** `.DS_Store` cleanup
 - [x] **Bryan:** Stubs in `routes/ratings.js` and `routes/checkins.js`
@@ -257,6 +259,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 - [ ] **Both:** Pull, run `npm run dev`, confirm "Connected" and "Server running on port 3000"
 
 ### Phase 1: Backend (full CRUD)
+
 - [ ] **Both:** Agree on the data model above and the API response format
 - [ ] **Eleah:** `spots` CRUD routes in `routes/spots.js`
 - [ ] **Bryan:** `ratings` CRUD routes and average rating in `routes/ratings.js`
@@ -264,20 +267,24 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 - [ ] **Both:** Route tests for your own routes (success, invalid input, missing records)
 
 ### Phase 2: Frontend (client-side rendering)
+
 - [ ] **Eleah:** `spots.html` and `js/spots.js`: fetch from `/api/spots`, render cards, add/edit/delete form, filters
 - [ ] **Bryan:** `ratings.html` and `js/ratings.js`: star rating UI, average rating
 - [ ] **Bryan:** `checkins.html` and `js/checkins.js`: check-in form, "crowded now"
 
 ### Phase 3: Data and Deployment
+
 - [ ] **Both:** Seed scripts in `seed/` for your own collections (1,000+ records total)
 - [ ] **Both:** Deploy early and confirm the live site connects to MongoDB
 
 ### Phase 4: Map and Algorithms
+
 - [ ] **Eleah:** Google Map limited to campus bounds
 - [ ] **Eleah:** KNN recommender in `ml/knn.js` with explanations, plus tests
 - [ ] **Bryan:** Weighted forecast in `ml/forecast.js`, plus tests
 
 ### Phase 5: Submission
+
 - [ ] **Eleah:** Final styling pass
 - [ ] **Both:** Screenshot, deployed URL, and video link in README
 - [ ] **Both:** Narrated demo video
