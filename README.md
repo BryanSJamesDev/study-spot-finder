@@ -3,7 +3,9 @@
 Find study spots on Northeastern's campus that match how you study.
 
 **Team:** Eleah and Bryan James
+
 **Stack:** Node.js, Express, Vanilla ES6, MongoDB (Node driver), Google Maps JS API
+
 **Design:** [Figma file](https://www.figma.com/design/gAZKaGijIlob4iAr49KcYV/Untitled)
 
 ---
