@@ -147,3 +147,40 @@ On narrow screens, the nav wraps into a grid, and side-by-side sections (like th
 - **Simple crowd levels.** Three levels (Not busy, Moderate, Very busy) are quick to report in a few seconds. More options would make check-ins slower and less likely to happen.
 - **Explain recommendations.** The "spots like this" list says *why* each spot matched, so students can trust the suggestion instead of guessing.
 - **Simulated users.** The professor confirmed a full login system isn't needed for this project, so the app focuses on the study spot features instead of authentication.
+  
+---
+
+## 6. Architecture
+
+### Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | HTML5, CSS (split by module), vanilla JavaScript (ES modules) |
+| Backend | Node.js and Express |
+| Database | MongoDB Atlas, using the official MongoDB Node.js driver |
+| Map | Google Maps JavaScript API |
+| Tooling | ESLint, Prettier, Node's built-in test runner |
+
+The project does not use React, Mongoose, template engines, or server-side rendering. All JavaScript uses ES modules (`import`/`export`), never `require()`.
+
+### How the pieces connect
+
+```mermaid
+flowchart LR
+    A["Browser<br/>HTML + CSS + vanilla JS"] -- "fetch /api/..." --> B["Express server<br/>server.js"]
+    B -- "serves static files" --> A
+    B --> C["routes/spots.js"]
+    B --> D["routes/ratings.js"]
+    B --> E["routes/checkins.js"]
+    C --> F["db.js<br/>getDB()"]
+    D --> F
+    E --> F
+    F --> G[("MongoDB Atlas<br/>spots, ratings, checkins")]
+```
+
+1. **Express serves the frontend.** `server.js` serves everything in the `public` folder (the HTML pages, CSS, and browser JavaScript) as static files.
+2. **The browser renders the page.** Each HTML page starts as a mostly empty shell. Its JavaScript file fetches data from the API and builds the page content in the browser. This is client-side rendering, with no template engine.
+3. **Routes handle the data.** Each collection has its own route file, mounted under `/api`. For example, `routes/spots.js` handles everything at `/api/spots`.
+4. **One shared database connection.** `db.js` connects to MongoDB once when the server starts. Every route file calls `getDB()` to reuse that connection, instead of opening a new one per request.
+5. **The server starts only after the database connects.** If MongoDB isn't reachable, the server logs the error and stops, so no request ever hits a route
