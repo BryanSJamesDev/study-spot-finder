@@ -184,3 +184,74 @@ flowchart LR
 3. **Routes handle the data.** Each collection has its own route file, mounted under `/api`. For example, `routes/spots.js` handles everything at `/api/spots`.
 4. **One shared database connection.** `db.js` connects to MongoDB once when the server starts. Every route file calls `getDB()` to reuse that connection, instead of opening a new one per request.
 5. **The server starts only after the database connects.** If MongoDB isn't reachable, the server logs the error and stops, so no request ever hits a route
+
+---
+
+## 7. Data Model
+
+The app uses three MongoDB collections. Each one supports full CRUD (create, read, update, delete) through its own set of API routes.
+
+### `spots` (Eleah)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `_id` | ObjectId | Created by MongoDB |
+| `name` | String | Required, unique |
+| `noiseLevel` | String | Scale to be finalized (e.g. Quiet, Moderate, Loud) |
+| `outlets` | Boolean | Are outlets available? |
+| `wifi` | Boolean | Is Wi-Fi available? |
+| `closingTime` | String | For example, "22:00" |
+| `tags` | Array of strings | For example, `["group study", "natural light"]` |
+| `lat` | Number | Latitude, limited to Northeastern's campus |
+| `lng` | Number | Longitude, limited to Northeastern's campus |
+
+Example:
+
+```json
+{
+  "name": "Snell Library 2nd Floor",
+  "noiseLevel": "Quiet",
+  "outlets": true,
+  "wifi": true,
+  "closingTime": "23:00",
+  "tags": ["quiet zone", "outlets"],
+  "lat": 42.3381,
+  "lng": -71.0882
+}
+```
+
+### `ratings` (Bryan)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `_id` | ObjectId | Created by MongoDB |
+| `spotName` | String | Required, matches a spot's `name` |
+| `stars` | Number | Required, whole number from 1 to 5 |
+| `createdAt` | Date | When the rating was submitted |
+
+### `checkins` (Bryan)
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `_id` | ObjectId | Created by MongoDB |
+| `spotName` | String | Required, matches a spot's `name` |
+| `crowdLevel` | String | Not busy, Moderate, or Very busy |
+| `day` | String | Day of the week, used by the forecast |
+| `hour` | Number | Hour of the day (0 to 23), used by the forecast |
+| `note` | String | Optional |
+| `createdAt` | Date | Used for "crowded now" (last 2 hours) |
+
+### Why reference spots by name?
+
+Ratings and check-ins store the spot's name as text instead of its MongoDB `_id`. This keeps each teammate's code independent: Bryan can build and test ratings and check-ins without needing Eleah's spots code to be finished. The tradeoff is that spot names must be unique, so the `spots` collection enforces a unique `name`.
+
+### To be finalized
+
+- The scale for `noiseLevel`.
+- Whether to add a `building` field to spots and an optional `review` text field to ratings, as shown in the mockups.
+- What happens to a spot's ratings and check-ins if the spot is renamed or deleted.
+- How a student edits or deletes "their" rating or check-in without user accounts.
+
+### Test data
+
+The project needs more than 1,000 database records. Each teammate writes a seed script in `seed/` that generates realistic sample data for their own collections, so the database can be filled or reset with one command.
