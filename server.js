@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import { connectDB } from "./db.js";
+import spotsRouter from "./routes/spots.js";
 
 // Create the app with express and save it in a variable
 const app = express();
@@ -14,6 +15,8 @@ app.use(express.json());
 // Serve files from the public folder so the HTML loads
 app.use(express.static("public"));
 
+// Use the backend routes
+app.use("/api/spots", spotsRouter);
 // Connect DB
 async function startServer() {
     try {
