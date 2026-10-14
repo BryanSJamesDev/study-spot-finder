@@ -1,6 +1,7 @@
 import test, { before, after } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
+import { ObjectId } from "mongodb";
 import spotsRouter from "../routes/spots.js";
 import { connectDB, getDB, closeDB } from "../db.js";
 
@@ -108,5 +109,37 @@ test("database failure returns 500", async () => {
     assert.equal(body.error, "Failed to load spots");
   } finally {
     await connectDB();
+  }
+});
+
+// Helper function to send POST requests with spot data
+function postSpot(data) {
+  return fetch(baseUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+/** Test a valid spot returns 201 and trims extra spaces. */
+test("valid spot returns 201", async () => {
+  const res = await postSpot({
+    name: "  Test Spot for POST  ",
+    building: "  Snell Library  ",
+    noiseLevel: "Quiet",
+  });
+  const body = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+    assert.ok(body._id);
+    assert.equal(body.name, "Test Spot for POST");
+    assert.equal(body.building, "Snell Library");
+  } finally {
+    if (body._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({ _id: new ObjectId(body._id) });
+    }
   }
 });
