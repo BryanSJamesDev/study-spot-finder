@@ -73,3 +73,24 @@ test("malformed MONGO_URI fails", () => {
 
   assert.notEqual(result.status, 0);
 });
+
+/** Test that connectDB fails when the server is unreachable. */
+test("connectDB fails when the server is unreachable", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      "--input-type=module",
+      "-e",
+      "const { connectDB } = await import('./db.js'); await connectDB();",
+    ],
+    {
+      env: {
+        ...process.env,
+        MONGO_URI: "mongodb://127.0.0.1:1/?serverSelectionTimeoutMS=500",
+      },
+      encoding: "utf8",
+    },
+  );
+
+  assert.notEqual(result.status, 0);
+});
