@@ -50,5 +50,32 @@ spotsRouter.get("/:id", async (req, res) => {
   }
 });
 
+// Global noise levels
+const NOISE_LEVELS = ["Quiet", "Moderate", "Loud"];
+
+// Helper function that takes spot data and returns a list of error messages
+function validateSpot(spot) {
+  const errors = [];
+
+  // Check if name is not an empty string
+  if (typeof spot.name !== "string" || spot.name.trim() === "") {
+    errors.push("Name is required");
+  }
+
+  // Check that building is not an empty string
+  if (typeof spot.building !== "string" || spot.building.trim() === "") {
+    errors.push("Building is required");
+  }
+
+  // Check that noiseLevel is one of the select values
+  if (!NOISE_LEVELS.includes(spot.noiseLevel)) {
+    errors.push(
+      "Noise level must be one of the following: Quiet, Moderate, or Loud",
+    );
+  }
+
+  // Return errors
+  return errors;
+}
 // Export the router so it can be used in server.js
 export default spotsRouter;
