@@ -77,5 +77,52 @@ function validateSpot(spot) {
   // Return errors
   return errors;
 }
+
+// Handle POST requests to /api/spots which adds a spot
+spotsRouter.post("/", async (req, res) => {
+  // Get a spot from the body
+  const spot = req.body ?? {};
+
+  // Validate the spot using the helper function
+  const errors = validateSpot(spot);
+
+  // If there are errors return the status and the error
+  if (errors.length > 0) {
+    return res.status(400).json({
+      error: errors.join(", "),
+    });
+  }
+  try {
+    // Check for duplicate name
+    const existing = await getDB()
+      .collection("spots")
+      .findOne({ name: spot.name.trim() });
+
+    if (existing) {
+      return res
+        .status(409)
+        .json({ error: "A spot with that name already exists" });
+    }
+
+    // Build new spot from allowable fields
+    const newSpot = {
+      name: spot.name.trim(),
+      building: spot.building.trim(),
+      noiseLevel: spot.noiseLevel,
+    };
+
+    // Insert the new spot
+    const result = await getDB().collection("spots").insertOne(newSpot);
+
+    // Return the spot
+    res.status(201).json({ _id: result.insertedId, ...newSpot });
+  } catch (error) {
+    // Log the error if creating the spot fails
+    console.error("Failed to create spot", error);
+
+    // Return a 500 status code to indicate a server error
+    res.status(500).json({ error: "Failed to create spot" });
+  }
+});
 // Export the router so it can be used in server.js
 export default spotsRouter;
