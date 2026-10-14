@@ -223,3 +223,32 @@ test("empty body returns all validation errors", async () => {
   assert.match(body.error, /Building is required/);
   assert.match(body.error, /Noise level/);
 });
+
+/** Test a duplicate spot name returns a 409 status code. */
+test("duplicate spot name returns 409", async () => {
+  const firstRes = await postSpot({
+    name: "Test Spot for Duplicate",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+  const first = await firstRes.json();
+
+  try {
+    const res = await postSpot({
+      name: "  Test Spot for Duplicate  ",
+      building: "Snell Library",
+      noiseLevel: "Quiet",
+    });
+
+    assert.equal(res.status, 409);
+
+    const body = await res.json();
+    assert.equal(body.error, "A spot with that name already exists");
+  } finally {
+    if (first._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({ _id: new ObjectId(first._id) });
+    }
+  }
+});
