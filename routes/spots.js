@@ -74,6 +74,16 @@ function validateSpot(spot) {
     );
   }
 
+  // Check that outlets is a boolean if provided
+  if (spot.outlets !== undefined && typeof spot.outlets !== "boolean") {
+    errors.push("Outlets must be true or false");
+  }
+
+  // Check that wifi is a boolean if provided
+  if (spot.wifi !== undefined && typeof spot.wifi !== "boolean") {
+    errors.push("Wi-Fi must be true or false");
+  }
+
   // Return errors
   return errors;
 }
@@ -109,6 +119,8 @@ spotsRouter.post("/", async (req, res) => {
       name: spot.name.trim(),
       building: spot.building.trim(),
       noiseLevel: spot.noiseLevel,
+      outlets: spot.outlets ?? false,
+      wifi: spot.wifi ?? false,
     };
 
     // Insert the new spot
