@@ -31,13 +31,13 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
 ## Folder Structure
 
     study-spot-finder/
-    ├── server.js              # Eleah (shared, done)
-    ├── db.js                  # Eleah (shared, done)
-    ├── package.json           # Shared (done)
-    ├── eslint.config.js       # Shared (done)
-    ├── .prettierrc            # Shared (done)
+    ├── server.js              # Eleah (shared)
+    ├── db.js                  # Eleah (shared)
+    ├── package.json           # Shared
+    ├── eslint.config.js       # Shared
+    ├── .prettierrc            # Shared
     ├── .gitignore             # Bryan
-    ├── LICENSE                # MIT (done)
+    ├── LICENSE                # MIT
     ├── README.md              # Both (see rules below)
     ├── docs/
     │   ├── design-document.md # Eleah (project description, personas, stories, mockups)
@@ -243,7 +243,7 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 
 Must-haves come first. The map and algorithms come after the core app is deployed and working.
 
-### Phase 0: Setup (done)
+### Phase 0: Setup
 
 - [x] **Bryan:** `npm init`, install dependencies (`express`, `mongodb`, `dotenv`), `.gitignore`, push to `main`
 - [x] **Bryan:** `.DS_Store` cleanup
@@ -255,8 +255,8 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 - [x] **Eleah:** `public/index.html` shell with styled nav
 - [x] **Eleah:** CSS split into modules (`shared`, `nav`, `spots`, `ratings`, `checkins`)
 - [x] **Eleah:** MIT license, Prettier, ESLint
-- [ ] **Eleah:** `tests/db.test.js`
-- [ ] **Both:** Pull, run `npm run dev`, confirm "Connected" and "Server running on port 3000"
+- [x] **Eleah:** `tests/db.test.js`
+- [x] **Both:** Pull, run `npm run dev`, confirm "Connected" and "Server running on port 3000"
 
 ### Phase 1: Backend (full CRUD)
 
@@ -297,7 +297,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 **Bryan:** Pull `main`. Then start Phase 1 on a `bryan/ratings` branch in `routes/ratings.js`. Run `npm run format` and `npm run lint` before each commit.
 
-**Eleah:** `db.test.js`, then `spots` CRUD routes on an `eleah/spots` branch.
+**Eleah:** `spots` CRUD routes on an `eleah/spots` branch.
 
 **Both:** Settle the "To decide together" questions in the Data Model section before writing CRUD routes.
 
