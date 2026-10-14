@@ -64,7 +64,7 @@ The app turns scattered, word-of-mouth knowledge into shared, searchable informa
 
 > As a student, I want to add, edit, and delete a study spot with its noise level, outlets, Wi-Fi, closing time, tags, and location, so that other students know what it's like.
 
-Priya finally finds a spot she loves: a bright, calm lounge on the second floor of a building near her classes. It has big windows and a few outlets along the wall, and nobody else seems to know about it. She opens Study Spot Finder, goes to the Spots page, and fills out the "Add a study spot" form. She enters the name, sets the noise level to moderate, marks outlets and Wi-Fi as available, adds the closing time, and tags it "natural light." The spot appears on the map and in the list right away. A week later she notices the lounge now closes earlier, so she clicks "Edit spot" and updates the closing time.
+Priya finally finds a spot she loves: a bright, calm lounge on the second floor of a building near her classes. It has big windows and a few outlets along the wall, and nobody else seems to know about it. She opens Study Spot Finder, goes to the Spots page, and fills out the "Add a study spot" form. She enters the name and building, sets the noise level to moderate, marks outlets and Wi-Fi as available, adds the closing time, and tags it "natural light." The spot appears on the map and in the list right away. A week later she notices the lounge now closes earlier, so she clicks "Edit spot" and updates the closing time.
 
 ### Story 2: Finding a spot on the map, and similar ones (Eleah)
 
@@ -103,6 +103,8 @@ Introduces the app with a short headline and two main actions: "Explore study sp
 ### Spots
 
 The main page for finding a spot. A search bar and filter chips (noise, outlets, Wi-Fi, tags) sit above a map and a list of matching spot cards. Each card shows the spot's rating, tags, and current crowd level. The "Add or edit a study spot" form sits at the bottom of the page.
+
+**Changes from the mockup:** The "Add or edit a study spot" form will also include a closing time field (`<input type="time">`) and a way to set the spot's location by clicking the map. Both are part of the approved proposal but weren't in the original Figma frame.
 
 ### Ratings
 
@@ -146,6 +148,7 @@ On narrow screens, the nav wraps into a grid, and side-by-side sections (like th
 - **Students add the data.** Spots, ratings, and check-ins all come from students, so the information stays current without anyone maintaining it.
 - **Simple crowd levels.** Three levels (Not busy, Moderate, Very busy) are quick to report in a few seconds. More options would make check-ins slower and less likely to happen.
 - **Explain recommendations.** The "spots like this" list says _why_ each spot matched, so students can trust the suggestion instead of guessing.
+- **Free, keyless map.** The map uses Leaflet with OpenStreetMap instead of Google Maps, at the professor's suggestion, so the app never runs up usage charges and has no map key to protect.
 - **Simulated users.** The professor confirmed a full login system isn't needed for this project, so the app focuses on the study spot features instead of authentication.
 
 ---
@@ -159,7 +162,7 @@ On narrow screens, the nav wraps into a grid, and side-by-side sections (like th
 | Frontend | HTML5, CSS (split by module), vanilla JavaScript (ES modules) |
 | Backend  | Node.js and Express                                           |
 | Database | MongoDB Atlas, using the official MongoDB Node.js driver      |
-| Map      | Google Maps JavaScript API                                    |
+| Map      | Leaflet with OpenStreetMap (free, no API key)                 |
 | Tooling  | ESLint, Prettier, Node's built-in test runner                 |
 
 The project does not use React, Mongoose, template engines, or server-side rendering. All JavaScript uses ES modules (`import`/`export`), never `require()`.
@@ -183,7 +186,19 @@ flowchart LR
 2. **The browser renders the page.** Each HTML page starts as a mostly empty shell. Its JavaScript file fetches data from the API and builds the page content in the browser. This is client-side rendering, with no template engine.
 3. **Routes handle the data.** Each collection has its own route file, mounted under `/api`. For example, `routes/spots.js` handles everything at `/api/spots`.
 4. **One shared database connection.** `db.js` connects to MongoDB once when the server starts. Every route file calls `getDB()` to reuse that connection, instead of opening a new one per request.
-5. **The server starts only after the database connects.** If MongoDB isn't reachable, the server logs the error and stops, so no request ever hits a route
+5. **The server starts only after the database connects.** If MongoDB isn't reachable, the server logs the error and stops, so no request ever hits a route before the database is ready.
+
+### Code organization
+
+- **Backend:** `server.js` (app setup), `db.js` (database module), `routes/` (one file per collection), `ml/` (KNN and forecast algorithms), `seed/` (scripts to generate test data).
+- **Frontend:** one HTML file per page in `public/`, one JavaScript module per page in `public/js/`, and CSS split by module in `public/css/` (`shared.css`, `nav.css`, and one file per page).
+- **Tests:** `tests/`, run with `npm test`. Route tests start a small Express app on a random free port and send real requests, and each test cleans up any data it creates.
+- **Ownership:** each teammate builds their features end to end in their own files. Ratings and check-ins reference spots by name rather than by ID, so neither teammate's code depends on the other's.
+
+### Security
+
+- The MongoDB connection string lives in a `.env` file that's gitignored and never pushed. Each teammate uses their own database user.
+- The map uses Leaflet with OpenStreetMap, which needs no API key, so there's no map secret to protect.
 
 ---
 
@@ -193,23 +208,25 @@ The app uses three MongoDB collections. Each one supports full CRUD (create, rea
 
 ### `spots` (Eleah)
 
-| Field         | Type             | Notes                                              |
-| ------------- | ---------------- | -------------------------------------------------- |
-| `_id`         | ObjectId         | Created by MongoDB                                 |
-| `name`        | String           | Required, unique                                   |
-| `noiseLevel`  | String           | Scale to be finalized (e.g. Quiet, Moderate, Loud) |
-| `outlets`     | Boolean          | Are outlets available?                             |
-| `wifi`        | Boolean          | Is Wi-Fi available?                                |
-| `closingTime` | String           | For example, "22:00"                               |
-| `tags`        | Array of strings | For example, `["group study", "natural light"]`    |
-| `lat`         | Number           | Latitude, limited to Northeastern's campus         |
-| `lng`         | Number           | Longitude, limited to Northeastern's campus        |
+| Field         | Type             | Notes                                                       |
+| ------------- | ---------------- | ----------------------------------------------------------- |
+| `_id`         | ObjectId         | Created by MongoDB                                          |
+| `name`        | String           | Required, unique, spaces trimmed                            |
+| `building`    | String           | Required, spaces trimmed (for example, "Snell Library")     |
+| `noiseLevel`  | String           | Required: Quiet, Moderate, or Loud                          |
+| `outlets`     | Boolean          | Optional, defaults to `false`                               |
+| `wifi`        | Boolean          | Optional, defaults to `false`                               |
+| `closingTime` | String           | Optional, 24-hour "HH:MM" (for example, "22:00"), or `null` |
+| `tags`        | Array of strings | Optional, defaults to `[]` (for example, `["group study"]`) |
+| `lat`         | Number           | Latitude, limited to Northeastern's campus                  |
+| `lng`         | Number           | Longitude, limited to Northeastern's campus                 |
 
 Example:
 
 ```json
 {
-  "name": "Snell Library 2nd Floor",
+  "name": "Snell Quiet Floor",
+  "building": "Snell Library, 2nd floor",
   "noiseLevel": "Quiet",
   "outlets": true,
   "wifi": true,
@@ -243,14 +260,20 @@ Example:
 
 ### Why reference spots by name?
 
-Ratings and check-ins store the spot's name as text instead of its MongoDB `_id`. This keeps each teammate's code independent: Bryan can build and test ratings and check-ins without needing Eleah's spots code to be finished. The tradeoff is that spot names must be unique, so the `spots` collection enforces a unique `name`.
+Ratings and check-ins store the spot's name as text instead of its MongoDB `_id`. This keeps each teammate's code independent: Bryan can build and test ratings and check-ins without needing Eleah's spots code to be finished. The tradeoff is that spot names must be unique, so the spots API rejects a new spot whose name is already taken.
+
+### Decisions
+
+- **Noise level:** Quiet, Moderate, or Loud.
+- **Crowd level:** Not busy, Moderate, or Very busy.
+- **Building:** spots have a required `building` field, as shown in the mockups.
+- **Renamed or deleted spots:** a spot's ratings and check-ins are left as they are, so each teammate's code only touches their own collections.
+- **Editing and deleting without accounts:** anyone can edit or delete a rating or check-in. The professor confirmed simulated users are fine.
+- **Error format:** the API returns errors as `{ "error": "message" }` with status `400` (bad input), `404` (not found), `409` (duplicate), or `500` (server error).
 
 ### To be finalized
 
-- The scale for `noiseLevel`.
-- Whether to add a `building` field to spots and an optional `review` text field to ratings, as shown in the mockups.
-- What happens to a spot's ratings and check-ins if the spot is renamed or deleted.
-- How a student edits or deletes "their" rating or check-in without user accounts.
+- Whether ratings get an optional written `review` field, as shown in the mockups.
 
 ### Test data
 
@@ -309,7 +332,7 @@ Each teammate builds their features end to end: the page, the browser JavaScript
 **Features**
 
 - **Add and manage study spots:** the Spots page form, `routes/spots.js` with full CRUD, and the `spots` collection.
-- **Map and filters:** the Google Maps integration limited to campus, plus filtering by noise, outlets, Wi-Fi, and tags.
+- **Map and filters:** the Leaflet map limited to campus, plus filtering by noise, outlets, Wi-Fi, and tags.
 - **KNN recommender:** the "spots like this" algorithm in `ml/knn.js` and its explanations.
 
 **Project setup and design**
@@ -319,6 +342,7 @@ Each teammate builds their features end to end: the page, the browser JavaScript
 - All CSS, split by module (`shared.css`, `nav.css`, and one file per page).
 - Home page and shared nav.
 - ESLint, Prettier, and MIT license setup.
+- Database and spots route tests.
 - README and this design document.
 
 ### Bryan James
@@ -341,5 +365,5 @@ Each teammate builds their features end to end: the page, the browser JavaScript
 - Data model decisions.
 - Seed scripts for 1,000+ records (each teammate seeds their own collections).
 - Deployment.
-- Code review through pull requests.
+- Code review.
 - Demo video and presentation.
