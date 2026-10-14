@@ -84,6 +84,24 @@ function validateSpot(spot) {
     errors.push("Wi-Fi must be true or false");
   }
 
+  // Check that closingTime is in HH:MM format if provided
+  if (
+    spot.closingTime !== undefined &&
+    (typeof spot.closingTime !== "string" ||
+      !/^([01]\d|2[0-3]):[0-5]\d$/.test(spot.closingTime))
+  ) {
+    errors.push("Closing time must be in HH:MM format");
+  }
+
+  // Check that tags is a list of non-empty strings if provided
+  if (
+    spot.tags !== undefined &&
+    (!Array.isArray(spot.tags) ||
+      !spot.tags.every((tag) => typeof tag === "string" && tag.trim() !== ""))
+  ) {
+    errors.push("Tags must be a list of words");
+  }
+
   // Return errors
   return errors;
 }
@@ -121,6 +139,8 @@ spotsRouter.post("/", async (req, res) => {
       noiseLevel: spot.noiseLevel,
       outlets: spot.outlets ?? false,
       wifi: spot.wifi ?? false,
+      closingTime: spot.closingTime ?? null,
+      tags: (spot.tags ?? []).map((tag) => tag.trim()),
     };
 
     // Insert the new spot
