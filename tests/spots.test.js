@@ -143,3 +143,44 @@ test("valid spot returns 201", async () => {
     }
   }
 });
+
+/** Test a missing name returns a 400 status code. */
+test("missing name returns 400", async () => {
+  const res = await postSpot({
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.match(body.error, /Name is required/);
+});
+
+/** Test a name containing only spaces returns a 400 status code. */
+test("name with only spaces returns 400", async () => {
+  const res = await postSpot({
+    name: "   ",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.match(body.error, /Name is required/);
+});
+
+/** Test a name with the wrong type returns a 400 status code. */
+test("name with the wrong type returns 400", async () => {
+  const res = await postSpot({
+    name: 123,
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.match(body.error, /Name is required/);
+});
