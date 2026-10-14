@@ -184,3 +184,42 @@ test("name with the wrong type returns 400", async () => {
   const body = await res.json();
   assert.match(body.error, /Name is required/);
 });
+
+/** Test a missing building returns a 400 status code. */
+test("missing building returns 400", async () => {
+  const res = await postSpot({
+    name: "Test Spot",
+    noiseLevel: "Quiet",
+  });
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.match(body.error, /Building is required/);
+});
+
+/** Test an invalid noise level returns a 400 status code. */
+test("wrong noise level returns 400", async () => {
+  const res = await postSpot({
+    name: "Test Spot",
+    building: "Snell Library",
+    noiseLevel: "quiet",
+  });
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.match(body.error, /Noise level/);
+});
+
+/** Test an empty body returns all three validation errors. */
+test("empty body returns all validation errors", async () => {
+  const res = await postSpot({});
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.match(body.error, /Name is required/);
+  assert.match(body.error, /Building is required/);
+  assert.match(body.error, /Noise level/);
+});
