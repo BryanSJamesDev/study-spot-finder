@@ -2,7 +2,7 @@ import test, { before, after } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
 import spotsRouter from "../routes/spots.js";
-import { connectDB, closeDB } from "../db.js";
+import { connectDB, getDB, closeDB } from "../db.js";
 
 const server = express();
 let baseUrl;
@@ -55,4 +55,32 @@ test("nonexistent spot ID returns 404", async () => {
 
   const body = await res.json();
   assert.equal(body.error, "Spot not found");
+});
+
+/** Test GET /api/spots returns a list of spots. */
+test("GET /api/spots returns a list", async () => {
+  const res = await fetch(baseUrl);
+
+  assert.equal(res.status, 200);
+
+  const body = await res.json();
+  assert.ok(Array.isArray(body));
+});
+
+/** Test GET /api/spots/:id returns the spot when it exists. */
+test("GET /api/spots/:id returns the spot", async () => {
+  const { insertedId } = await getDB()
+    .collection("spots")
+    .insertOne({ name: "Test Spot for GET" });
+
+  try {
+    const res = await fetch(`${baseUrl}/${insertedId}`);
+
+    assert.equal(res.status, 200);
+
+    const body = await res.json();
+    assert.equal(body.name, "Test Spot for GET");
+  } finally {
+    await getDB().collection("spots").deleteOne({ _id: insertedId });
+  }
 });
