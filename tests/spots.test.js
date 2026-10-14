@@ -84,3 +84,29 @@ test("GET /api/spots/:id returns the spot", async () => {
     await getDB().collection("spots").deleteOne({ _id: insertedId });
   }
 });
+
+/** Test a 12-character invalid spot ID returns a 400 status code. */
+test("12-character spot ID returns 400", async () => {
+  const res = await fetch(`${baseUrl}/hello%20world!`);
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.equal(body.error, "Invalid spot ID");
+});
+
+/** Test a database failure returns a 500 status code. */
+test("database failure returns 500", async () => {
+  await closeDB();
+
+  try {
+    const res = await fetch(baseUrl);
+
+    assert.equal(res.status, 500);
+
+    const body = await res.json();
+    assert.equal(body.error, "Failed to load spots");
+  } finally {
+    await connectDB();
+  }
+});
