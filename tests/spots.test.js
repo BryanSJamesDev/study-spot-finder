@@ -252,3 +252,57 @@ test("duplicate spot name returns 409", async () => {
     }
   }
 });
+
+/** Test an invalid outlets value returns a 400 status code. */
+test("wrong outlets type returns 400", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Outlets Type",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+    outlets: "yes",
+  });
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.match(body.error, /Outlets must be true or false/);
+});
+
+/** Test an invalid Wi-Fi value returns a 400 status code. */
+test("wrong Wi-Fi type returns 400", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Wi-Fi Type",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+    wifi: 1,
+  });
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.match(body.error, /Wi-Fi must be true or false/);
+});
+
+/** Test outlets saves its value and wifi defaults to false. */
+test("outlets and wifi values are saved correctly", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Defaults",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+    outlets: true,
+  });
+
+  const body = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+    assert.equal(body.outlets, true);
+    assert.equal(body.wifi, false);
+  } finally {
+    if (body._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({ _id: new ObjectId(body._id) });
+    }
+  }
+});
