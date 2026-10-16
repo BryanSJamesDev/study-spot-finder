@@ -109,3 +109,15 @@ test("getSpotTags handles missing spots", () => {
     assert.deepEqual(getSpotTags(spot), []);
   }
 });
+
+/** Test that values that look true but are not booleans are ignored. */
+test("getSpotTags ignores values that are not true booleans", () => {
+  // Create a spot with incorrect values for outlets and Wi-Fi
+  const spot = {
+    outlets: "yes",
+    wifi: 1,
+  };
+
+  // Check that invalid boolean values do not return tags
+  assert.deepEqual(getSpotTags(spot), []);
+});
