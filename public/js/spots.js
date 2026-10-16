@@ -1,4 +1,4 @@
-import { formatClosingTime, getSpotTags } from "./spotUtils.js";
+import { formatClosingTime, getSpotTags, parseTags } from "./spotUtils.js";
 
 /* Helper function to load spots */
 async function loadSpots() {
@@ -17,6 +17,9 @@ async function loadSpots() {
 async function init() {
   const spots = await loadSpots();
   renderSpots(spots);
+
+  // Adds event listener for a submission of a form whether its enter or a click
+  document.querySelector("#spot-form").addEventListener("submit", handleSubmit);
 }
 
 /** Creates a card and returns it */
@@ -90,4 +93,57 @@ function renderSpots(spots) {
   }
 }
 
+/** Handle the submission of a form */
+async function handleSubmit(event) {
+  // Prevent reloading the whole page
+  event.preventDefault();
+
+  // Find the error spot and clear it to remove old errors
+  const errorMessage = document.querySelector("#form-error");
+  errorMessage.textContent = "";
+
+  // Read the fields
+  const data = new FormData(event.target);
+
+  // Create the spot
+  const spot = {
+    name: data.get("name"),
+    building: data.get("building"),
+    noiseLevel: data.get("noiseLevel"),
+    outlets: data.get("outlets") === "on",
+    wifi: data.get("wifi") === "on",
+    closingTime: data.get("closingTime") || undefined,
+    tags: parseTags(data.get("tags")),
+  };
+
+  try {
+    // Send the new spot to the POST route
+    const res = await fetch("/api/spots", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(spot),
+    });
+
+    // Read the response
+    const body = await res.json();
+
+    // If the response is not ok, display the error message
+    if (!res.ok) {
+      errorMessage.textContent = body.error;
+      return;
+    }
+
+    // If successful, clear the form
+    event.target.reset();
+
+    // Reload and display the updated spots
+    renderSpots(await loadSpots());
+  } catch (error) {
+    // Log the error and display a message if the request fails
+    console.error("Failed to save spot", error);
+    errorMessage.textContent = "Couldn't save the spot. Please try again.";
+  }
+}
 init();
