@@ -1,5 +1,9 @@
 import { formatClosingTime, getSpotTags, parseTags } from "./spotUtils.js";
 
+/** Global variables */
+// The ID of the spot being edited, or null when adding a new spot
+let editingId = null;
+
 /* Helper function to load spots */
 async function loadSpots() {
   // Load spots
@@ -70,6 +74,17 @@ function createSpotCard(spot) {
   const actions = document.createElement("div");
   actions.className = "card__actions";
 
+  // Create the edit button
+  const editButton = document.createElement("button");
+  editButton.type = "button";
+  editButton.className = "btn btn--secondary";
+  editButton.textContent = "Edit";
+  editButton.setAttribute("aria-label", `Edit ${spot.name}`);
+  editButton.addEventListener("click", () => startEditing(spot));
+
+  // Add the edit button to the actions
+  actions.append(editButton);
+
   // Create the delete button
   const deleteButton = document.createElement("button");
   deleteButton.type = "button";
@@ -131,10 +146,13 @@ async function handleSubmit(event) {
     tags: parseTags(data.get("tags")),
   };
 
+  // Update the spot being edited, or create a new one
+  const url = editingId ? `/api/spots/${editingId}` : "/api/spots";
+  const method = editingId ? "PUT" : "POST";
   try {
-    // Send the new spot to the POST route
-    const res = await fetch("/api/spots", {
-      method: "POST",
+    // Send the new spot to the PUT or POST route
+    const res = await fetch(url, {
+      method: method,
       headers: {
         "Content-Type": "application/json",
       },
@@ -149,6 +167,9 @@ async function handleSubmit(event) {
       errorMessage.textContent = body.error;
       return;
     }
+
+    // Leave edit mode
+    editingId = null;
 
     // If successful, clear the form
     event.target.reset();
@@ -186,6 +207,27 @@ async function deleteSpot(spot) {
     console.error(`Couldn't delete ${spot.name}. Please try again.`, error);
     alert(`Couldn't delete ${spot.name}. Please try again.`);
   }
+}
+
+/** Fills form, sets editing ID, and scrolls form into view */
+function startEditing(spot) {
+  // Find the form
+  const form = document.querySelector("#spot-form");
+
+  // Fill each field with the spot's information
+  form.elements.name.value = spot.name;
+  form.elements.building.value = spot.building;
+  form.elements.noiseLevel.value = spot.noiseLevel;
+  form.elements.outlets.checked = spot.outlets;
+  form.elements.wifi.checked = spot.wifi;
+  form.elements.closingTime.value = spot.closingTime ?? "";
+  form.elements.tags.value = (spot.tags ?? []).join(", ");
+
+  // Remember which spot is being edited
+  editingId = spot._id;
+
+  // Scroll the form into view
+  form.scrollIntoView({ behavior: "smooth" });
 }
 
 init();
