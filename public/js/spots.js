@@ -66,6 +66,21 @@ function createSpotCard(spot) {
     card.append(tagList);
   }
 
+  // Create a container for the card's buttons
+  const actions = document.createElement("div");
+  actions.className = "card__actions";
+
+  // Create the delete button
+  const deleteButton = document.createElement("button");
+  deleteButton.type = "button";
+  deleteButton.className = "btn btn--secondary";
+  deleteButton.textContent = "Delete";
+  deleteButton.setAttribute("aria-label", `Delete ${spot.name}`);
+  deleteButton.addEventListener("click", () => deleteSpot(spot));
+
+  // Add the delete button to the actions, and the actions to the card
+  actions.append(deleteButton);
+  card.append(actions);
   // Return the completed card
   return card;
 }
@@ -146,4 +161,31 @@ async function handleSubmit(event) {
     errorMessage.textContent = "Couldn't save the spot. Please try again.";
   }
 }
+
+/** Handle the delete button */
+async function deleteSpot(spot) {
+  // Ask if you're sure you want to delete
+  if (!confirm(`Delete "${spot.name}"?`)) {
+    return;
+  }
+
+  try {
+    // Fetch the spot by ID and use method DELETE
+    const res = await fetch(`/api/spots/${spot._id}`, { method: "DELETE" });
+
+    // If the response is not ok, show an error and stop
+    if (!res.ok) {
+      alert(`Couldn't delete ${spot.name}. Please try again.`);
+      return;
+    }
+
+    // Rerender spots so the deleted spot disappears
+    renderSpots(await loadSpots());
+  } catch (error) {
+    // Log the error and display a message if the request fails
+    console.error(`Couldn't delete ${spot.name}. Please try again.`, error);
+    alert(`Couldn't delete ${spot.name}. Please try again.`);
+  }
+}
+
 init();
