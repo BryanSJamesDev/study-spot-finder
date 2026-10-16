@@ -165,5 +165,64 @@ spotsRouter.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to create spot" });
   }
 });
+
+// Handle PUT requests to /api/spots/:id which updates one spot based off an ID
+spotsRouter.put("/:id", async (req, res) => {
+  // Check if ID is not valid
+  if (!ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ error: "Invalid spot ID" });
+  }
+
+  // Define spot
+  const spot = req.body ?? {};
+  // Validate the spot using the helper function
+  const errors = validateSpot(spot);
+
+  // If there are errors return the status and the error
+  if (errors.length > 0) {
+    return res.status(400).json({
+      error: errors.join(", "),
+    });
+  }
+
+  try {
+    // Convert the ID
+    const id = new ObjectId(req.params.id);
+
+    // Check for duplicate name
+    const existing = await getDB()
+      .collection("spots")
+      .findOne({ name: spot.name.trim(), _id: { $ne: id } });
+
+    if (existing) {
+      return res
+        .status(409)
+        .json({ error: "A spot with that name already exists" });
+    }
+
+    // Build updated spot
+    const updatedSpot = buildSpot(spot);
+
+    // Update the spot with the new updated spot
+    const result = await getDB()
+      .collection("spots")
+      .updateOne({ _id: id }, { $set: updatedSpot });
+
+    // If spot doesnt exist return with spot not found
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: "Spot not found" });
+    }
+
+    // Send back spot
+    return res.json({ _id: id, ...updatedSpot });
+  } catch (error) {
+    // Log the error if updating the spot fails
+    console.error("Failed to update spot", error);
+
+    // Return a 500 status code to indicate a server error
+    res.status(500).json({ error: "Failed to update spot" });
+  }
+});
+
 // Export the router so it can be used in server.js
 export default spotsRouter;
