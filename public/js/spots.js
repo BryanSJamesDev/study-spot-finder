@@ -1,4 +1,4 @@
-import { formatClosingTime } from "./spotUtils.js";
+import { formatClosingTime, getSpotTags } from "./spotUtils.js";
 
 /* Helper function to load spots */
 async function loadSpots() {
@@ -40,8 +40,28 @@ function createSpotCard(spot) {
   details.className = "card__meta";
   details.textContent = `${spot.noiseLevel} · Closing time: ${formatClosingTime(spot.closingTime)}`;
 
+  // Get the tags
+  const tags = getSpotTags(spot);
+
+  // Create a container for the tag pills
+  const tagList = document.createElement("div");
+  tagList.className = "card__tags";
+
+  // Loop through tags and create a pill for each one
+  for (const tag of tags) {
+    const pill = document.createElement("span");
+    pill.className = "tag";
+    pill.textContent = tag;
+    tagList.append(pill);
+  }
+
   // Add all three elements to the card
   card.append(title, building, details);
+
+  // Add the tag container only if there are tags
+  if (tags.length > 0) {
+    card.append(tagList);
+  }
 
   // Return the completed card
   return card;
