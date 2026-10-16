@@ -121,3 +121,14 @@ test("getSpotTags ignores values that are not true booleans", () => {
   // Check that invalid boolean values do not return tags
   assert.deepEqual(getSpotTags(spot), []);
 });
+
+/** Test that invalid tags are filtered out. */
+test("getSpotTags filters out invalid tags", () => {
+  // Create a spot with valid and invalid tags
+  const spot = {
+    tags: ["quiet", "", "   ", 5, null],
+  };
+
+  // Check that only valid, non-empty string tags are returned
+  assert.deepEqual(getSpotTags(spot), ["quiet"]);
+});
