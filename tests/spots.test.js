@@ -306,3 +306,22 @@ test("outlets and wifi values are saved correctly", async () => {
     }
   }
 });
+
+/**
+ * Test that invalid closing times return a 400 status.
+ */
+test("invalid closing times return 400", async () => {
+  for (const closingTime of ["25:00", "10pm", "9:00", 2200]) {
+    const res = await postSpot({
+      name: "Test Spot",
+      building: "Snell Library",
+      noiseLevel: "Quiet",
+      closingTime,
+    });
+
+    assert.equal(res.status, 400);
+
+    const body = await res.json();
+    assert.match(body.error, /Closing time/);
+  }
+});
