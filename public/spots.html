@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spots · Study Spot Finder</title>
+    <link rel="stylesheet" href="./css/shared.css" />
+    <link rel="stylesheet" href="./css/nav.css" />
+    <link rel="stylesheet" href="./css/spots.css" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav__inner container">
+        <a href="index.html" class="nav__brand">
+          Study Spot Finder
+          <small class="text-muted">Northeastern University</small>
+        </a>
+        <ul class="nav__links">
+          <li>
+            <a href="index.html" class="nav__link">Home</a>
+          </li>
+          <li>
+            <a href="spots.html" class="nav__link" aria-current="page">Spots</a>
+          </li>
+          <li><a href="ratings.html" class="nav__link">Ratings</a></li>
+          <li><a href="checkins.html" class="nav__link">Check-Ins</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Find a spot that fits.</h1>
+      <p>
+        Explore campus spaces and narrow things down to your study essentials.
+      </p>
+      <section>
+        <h2>Study Spots</h2>
+        <div id="spot-list" class="spot-grid"></div>
+      </section>
+
+      <section class="panel">
+        <h2 id="form-title">Add a study spot</h2>
+        <form id="spot-form" class="form">
+          <!-- Spot name -->
+          <div class="field">
+            <label for="spot-name" class="field__label">Spot name *</label>
+            <input
+              id="spot-name"
+              name="name"
+              class="input"
+              type="text"
+              required
+            />
+          </div>
+
+          <!-- Building / location -->
+          <div class="field">
+            <label for="spot-building" class="field__label"
+              >Building / location *</label
+            >
+            <input
+              id="spot-building"
+              name="building"
+              class="input"
+              type="text"
+              required
+            />
+          </div>
+
+          <!-- Noise level -->
+          <div class="field">
+            <label for="spot-noise" class="field__label">Noise level *</label>
+            <select id="spot-noise" name="noiseLevel" class="select" required>
+              <option value="">Choose a noise level</option>
+              <option value="Quiet">Quiet</option>
+              <option value="Moderate">Moderate</option>
+              <option value="Loud">Loud</option>
+            </select>
+          </div>
+
+          <!-- Outlets -->
+          <div class="field field--checkbox">
+            <input id="spot-outlets" name="outlets" type="checkbox" />
+            <label for="spot-outlets">Outlets available</label>
+          </div>
+
+          <!-- Wi-Fi -->
+          <div class="field field--checkbox">
+            <input id="spot-wifi" name="wifi" type="checkbox" />
+            <label for="spot-wifi">Wi-Fi available</label>
+          </div>
+
+          <!-- Closing time -->
+          <div class="field">
+            <label for="spot-closing-time" class="field__label"
+              >Closing time</label
+            >
+            <input
+              id="spot-closing-time"
+              name="closingTime"
+              class="input"
+              type="time"
+            />
+          </div>
+
+          <!-- Tags -->
+          <div class="field">
+            <label for="spot-tags" class="field__label">Tags</label>
+            <input
+              id="spot-tags"
+              name="tags"
+              class="input"
+              type="text"
+              aria-describedby="spot-tags-hint"
+            />
+            <p id="spot-tags-hint" class="field__hint">
+              Separate tags with commas.
+            </p>
+          </div>
+
+          <!-- Form error message -->
+          <p id="form-error" class="field__error" role="alert"></p>
+
+          <!-- Form buttons -->
+          <div class="form__actions">
+            <!-- Submit button -->
+            <button type="submit" id="form-submit" class="btn btn--primary">
+              Save spot
+            </button>
+
+            <!-- Cancel button hidden by default -->
+            <button
+              type="button"
+              id="form-cancel"
+              class="btn btn--secondary"
+              hidden
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+    <script type="module" src="./js/spots.js"></script>
+  </body>
+</html>

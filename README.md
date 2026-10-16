@@ -54,6 +54,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     ├── tests/
     │   ├── db.test.js         # Eleah
     │   ├── spots.test.js      # Eleah
+    │   ├── spotUtils.test.js  # Eleah
     │   ├── knn.test.js        # Eleah
     │   └── forecast.test.js   # Bryan
     └── public/
@@ -69,6 +70,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
         │   └── checkins.css   # Eleah
         └── js/
             ├── spots.js       # Eleah
+            ├── spotUtils.js   # Eleah (formatting and tag helpers)
             ├── map.js         # Eleah
             ├── ratings.js     # Bryan
             └── checkins.js    # Bryan
@@ -124,12 +126,14 @@ Common classes:
 | `btn btn--primary`, `btn btn--secondary`                             | shared   | Buttons                                              |
 | `form`, `field`, `field__label`, `input`, `select`, `textarea`       | shared   | Forms                                                |
 | `field__hint`, `field__error`                                        | shared   | Help text and error messages under inputs            |
+| `field--checkbox`                                                    | shared   | A checkbox next to its label                         |
 | `tag`                                                                | shared   | Static tags                                          |
 | `spot-grid`, `spots-layout`, `map`, `chip`, `filters`, `card__tags`  | spots    | Spots page layout, map, and filter chips             |
+| `form__actions`                                                      | spots    | A row of form buttons (like Save and Cancel)         |
 | `rating`, `star-rating`                                              | ratings  | Average rating display and 1 to 5 star input         |
 | `status--success`, `status--warning`                                 | checkins | Crowd badges like "Not busy" or "Moderate"           |
 
-Colors, fonts, and spacing are CSS variables in `:root` in `shared.css` (for example `var(--color-primary)` or `var(--space-4)`). Use those instead of hex codes.
+Colors, fonts, and spacing are CSS variables in `:root` in `shared.css` (for example `var(--color-primary)` or `var(--space-4)`). Use those instead of hex codes. Don't use `!important`.
 
 ---
 
@@ -233,8 +237,9 @@ Errors are returned as `{ "error": "message" }` with status `400` (bad input), `
 - [x] ESLint config, zero lint errors
 - [x] Prettier formatting
 - [x] CSS organized by module
+- [x] Client-side rendering with vanilla JS (no template engines)
+- [x] At least 1 form
 - [ ] At least 2 MongoDB collections with full CRUD (we have 3)
-- [ ] Client-side rendering with vanilla JS (no template engines)
 - [ ] 1,000+ database records (via seed scripts)
 - [ ] Publicly deployed
 - [ ] Narrated public demo video
@@ -275,7 +280,9 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 ### Phase 2: Frontend (client-side rendering)
 
-- [ ] **Eleah:** `spots.html` and `js/spots.js`: fetch from `/api/spots`, render cards, add/edit/delete form, filters
+- [x] **Eleah:** `spots.html` and `js/spots.js`: fetch from `/api/spots`, render cards, add/edit/delete form
+- [x] **Eleah:** `js/spotUtils.js` helpers with tests in `tests/spotUtils.test.js`
+- [ ] **Eleah:** Filters on the Spots page (noise, outlets, Wi-Fi, tags)
 - [ ] **Bryan:** `ratings.html` and `js/ratings.js`: star rating UI, average rating
 - [ ] **Bryan:** `checkins.html` and `js/checkins.js`: check-in form, "crowded now"
 
@@ -293,6 +300,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 ### Phase 5: Submission
 
 - [ ] **Eleah:** Final styling pass
+- [ ] **Eleah:** Replace `confirm()` with a styled `<dialog>` for deleting spots
 - [ ] **Both:** Screenshot, deployed URL, and video link in README
 - [ ] **Both:** Narrated demo video
 - [ ] **Both:** Freeze code 24 hours before class
@@ -304,7 +312,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 **Bryan:** Pull `main`. Then build `ratings` CRUD on a `bryan/ratings` branch in `routes/ratings.js`. `routes/spots.js` and `tests/spots.test.js` are working examples of the patterns (validation helper, error format, route tests). Run `npm run format`, `npm run lint`, and `npm test` before each commit.
 
-**Eleah:** `spots.html` and `js/spots.js` on an `eleah/spots-page` branch.
+**Eleah:** Filters on the Spots page on an `eleah/spots-filters` branch.
 
 ---
 
