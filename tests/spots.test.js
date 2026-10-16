@@ -429,3 +429,49 @@ test("updating a spot saves the changes", async () => {
     }
   }
 });
+
+/**
+ * Test that updating a spot with an invalid ID returns a 400 status.
+ */
+test("PUT with invalid ID returns 400", async () => {
+  const res = await putSpot("hello", {
+    name: "Test Spot",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.equal(body.error, "Invalid spot ID");
+});
+
+/**
+ * Test that updating a spot that does not exist returns a 404 status.
+ */
+test("PUT for a nonexistent spot returns 404", async () => {
+  const res = await putSpot("000000000000000000000000", {
+    name: "Test Spot",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+
+  assert.equal(res.status, 404);
+
+  const body = await res.json();
+  assert.equal(body.error, "Spot not found");
+});
+
+/**
+ * Test that updating a spot with invalid data returns a 400 status.
+ */
+test("PUT with invalid data returns 400", async () => {
+  const res = await putSpot("000000000000000000000000", {});
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.match(body.error, /Name is required/);
+  assert.match(body.error, /Building is required/);
+  assert.match(body.error, /Noise level/);
+});
