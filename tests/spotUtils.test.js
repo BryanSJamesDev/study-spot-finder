@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { formatClosingTime, getSpotTags } from "../public/js/spotUtils.js";
+import {
+  formatClosingTime,
+  getSpotTags,
+  parseTags,
+} from "../public/js/spotUtils.js";
 
 /** Test that normal times format correctly. */
 test("formatClosingTime formats normal times", () => {
@@ -143,4 +147,58 @@ test("getSpotTags ignores tags that are not an array", () => {
 
   // Check that the outlet tag is returned and invalid tags are ignored
   assert.deepEqual(getSpotTags(spot), ["Outlets"]);
+});
+
+/** Test that normal input is parsed into tags correctly. */
+test("parseTags parses normal input", () => {
+  // Create test cases with input and expected tags
+  const cases = [
+    ["quiet zone, outlets", ["quiet zone", "outlets"]],
+    ["quiet", ["quiet"]],
+  ];
+
+  // Loop through test cases and check that tags are parsed correctly
+  for (const [input, expected] of cases) {
+    assert.deepEqual(parseTags(input), expected);
+  }
+});
+
+/** Test that extra spaces and commas are handled correctly. */
+test("parseTags handles messy input", () => {
+  // Create input with extra spaces, double commas, and a trailing comma
+  const input = "  quiet zone ,, outlets, ";
+
+  // Check that empty tags are removed and spaces are trimmed
+  assert.deepEqual(parseTags(input), ["quiet zone", "outlets"]);
+});
+
+/** Test that empty input returns an empty array. */
+test("parseTags handles empty input", () => {
+  // Create test cases for empty strings and commas
+  const cases = ["", "   ", ",,,"];
+
+  // Loop through test cases and check that an empty array is returned
+  for (const input of cases) {
+    assert.deepEqual(parseTags(input), []);
+  }
+});
+
+/** Test that inputs with the wrong type return an empty array. */
+test("parseTags handles incorrect input types", () => {
+  // Create test cases for null, undefined, numbers, and arrays
+  const cases = [null, undefined, 5, ["quiet"]];
+
+  // Loop through test cases and check that an empty array is returned
+  for (const input of cases) {
+    assert.deepEqual(parseTags(input), []);
+  }
+});
+
+/** Test that parseTags handles a large number of tags. */
+test("parseTags handles 1000 tags", () => {
+  // Create a string containing 1000 tags separated by commas
+  const text = Array(1000).fill("tag").join(",");
+
+  // Check that all 1000 tags are returned
+  assert.equal(parseTags(text).length, 1000);
 });
