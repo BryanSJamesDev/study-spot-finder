@@ -325,3 +325,22 @@ test("invalid closing times return 400", async () => {
     assert.match(body.error, /Closing time/);
   }
 });
+
+/**
+ * Test that invalid tags return a 400 status.
+ */
+test("invalid tags return 400", async () => {
+  for (const tags of ["quiet", ["quiet", ""], ["quiet", 5]]) {
+    const res = await postSpot({
+      name: "Test Spot",
+      building: "Snell Library",
+      noiseLevel: "Quiet",
+      tags,
+    });
+
+    assert.equal(res.status, 400);
+
+    const body = await res.json();
+    assert.match(body.error, /Tags must be a list of words/);
+  }
+});
