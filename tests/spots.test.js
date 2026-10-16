@@ -112,10 +112,20 @@ test("database failure returns 500", async () => {
   }
 });
 
+/** HELPER FUNCTIONS */
 // Helper function to send POST requests with spot data
 function postSpot(data) {
   return fetch(baseUrl, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+// Helper function to send PUT requests with spot data
+function putSpot(id, data) {
+  return fetch(`${baseUrl}/${id}`, {
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
@@ -369,6 +379,52 @@ test("closing time and tags save correctly", async () => {
         .collection("spots")
         .deleteOne({
           _id: new ObjectId(body._id),
+        });
+    }
+  }
+});
+
+/**
+ * Test that updating a spot saves the changes.
+ */
+test("updating a spot saves the changes", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Update",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+
+  const created = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+
+    const updateRes = await putSpot(created._id, {
+      name: "Test Spot for Update",
+      building: "Snell Library",
+      noiseLevel: "Loud",
+      closingTime: "20:00",
+    });
+
+    assert.equal(updateRes.status, 200);
+
+    const body = await updateRes.json();
+
+    assert.equal(body.noiseLevel, "Loud");
+    assert.equal(body.closingTime, "20:00");
+
+    // Check that the changes were saved in the database.
+    const getRes = await fetch(`${baseUrl}/${created._id}`);
+    const savedSpot = await getRes.json();
+
+    assert.equal(getRes.status, 200);
+    assert.equal(savedSpot.noiseLevel, "Loud");
+  } finally {
+    if (created._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({
+          _id: new ObjectId(created._id),
         });
     }
   }
