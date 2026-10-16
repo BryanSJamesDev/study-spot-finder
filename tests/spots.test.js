@@ -344,3 +344,32 @@ test("invalid tags return 400", async () => {
     assert.match(body.error, /Tags must be a list of words/);
   }
 });
+
+/**
+ * Test that closing time and tags save correctly.
+ */
+test("closing time and tags save correctly", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Time and Tags",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+    closingTime: "22:00",
+    tags: ["  quiet zone  ", "outlets"],
+  });
+
+  const body = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+    assert.equal(body.closingTime, "22:00");
+    assert.deepEqual(body.tags, ["quiet zone", "outlets"]);
+  } finally {
+    if (body._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({
+          _id: new ObjectId(body._id),
+        });
+    }
+  }
+});
