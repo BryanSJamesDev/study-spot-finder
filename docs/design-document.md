@@ -1,7 +1,7 @@
 # Study Spot Finder: Design Document
 
 **Authors:** Eleah Burman and Bryan James
-**Class:** [CS5610 Web Development](CLASS_LINK_HERE), Northeastern University
+**Class:** [CS5610 Web Development](https://johnguerra.co/classes/webDevelopment_online_fall_2026/), Northeastern University
 **Project repo:** [study-spot-finder](https://github.com/BryanSJamesDev/study-spot-finder)
 
 ---
