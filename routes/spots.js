@@ -224,5 +224,35 @@ spotsRouter.put("/:id", async (req, res) => {
   }
 });
 
+// Handle DELETE requests to /api/spots/:id which deletes one spot based off an ID
+spotsRouter.delete("/:id", async (req, res) => {
+  // Check if ID is not valid
+  if (!ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ error: "Invalid spot ID" });
+  }
+
+  try {
+    // Find the spot and delete it
+    const result = await getDB()
+      .collection("spots")
+      .deleteOne({ _id: new ObjectId(req.params.id) });
+
+    // If nothing was deleted then return spot not found
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Spot not found" });
+    }
+
+    // Otherwise send back done nothing left to send
+    else {
+      return res.status(204).end();
+    }
+  } catch (error) {
+    // Failed to delete spot
+    console.error("Failed to delete spot", error);
+
+    // Return a 500 status code to indicate a server error
+    res.status(500).json({ error: "Failed to delete spot" });
+  }
+});
 // Export the router so it can be used in server.js
 export default spotsRouter;
