@@ -37,6 +37,94 @@
         <h2>Study Spots</h2>
         <div id="spot-list" class="spot-grid"></div>
       </section>
+
+      <section class="panel">
+        <h2>Add a study spot</h2>
+        <form id="spot-form" class="form">
+          <!-- Spot name -->
+          <div class="field">
+            <label for="spot-name" class="field__label">Spot name *</label>
+            <input
+              id="spot-name"
+              name="name"
+              class="input"
+              type="text"
+              required
+            />
+          </div>
+
+          <!-- Building / location -->
+          <div class="field">
+            <label for="spot-building" class="field__label"
+              >Building / location *</label
+            >
+            <input
+              id="spot-building"
+              name="building"
+              class="input"
+              type="text"
+              required
+            />
+          </div>
+
+          <!-- Noise level -->
+          <div class="field">
+            <label for="spot-noise" class="field__label">Noise level *</label>
+            <select id="spot-noise" name="noiseLevel" class="select" required>
+              <option value="">Choose a noise level</option>
+              <option value="Quiet">Quiet</option>
+              <option value="Moderate">Moderate</option>
+              <option value="Loud">Loud</option>
+            </select>
+          </div>
+
+          <!-- Outlets -->
+          <div class="field field--checkbox">
+            <input id="spot-outlets" name="outlets" type="checkbox" />
+            <label for="spot-outlets">Outlets available</label>
+          </div>
+
+          <!-- Wi-Fi -->
+          <div class="field field--checkbox">
+            <input id="spot-wifi" name="wifi" type="checkbox" />
+            <label for="spot-wifi">Wi-Fi available</label>
+          </div>
+
+          <!-- Closing time -->
+          <div class="field">
+            <label for="spot-closing-time" class="field__label"
+              >Closing time</label
+            >
+            <input
+              id="spot-closing-time"
+              name="closingTime"
+              class="input"
+              type="time"
+            />
+          </div>
+
+          <!-- Tags -->
+          <div class="field">
+            <label for="spot-tags" class="field__label">Tags</label>
+            <input
+              id="spot-tags"
+              name="tags"
+              class="input"
+              type="text"
+              aria-describedby="spot-tags-hint"
+            />
+            <p id="spot-tags-hint" class="field__hint">
+              Separate tags with commas.
+            </p>
+          </div>
+
+          <!-- Form error message -->
+          <p id="form-error" class="field__error" role="alert"></p>
+
+          <!-- Submit button -->
+          <button type="submit" class="btn btn--primary">Save spot</button>
+        </form>
+      </section>
     </main>
     <script type="module" src="./js/spots.js"></script>
   </body>

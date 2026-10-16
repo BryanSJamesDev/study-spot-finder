@@ -61,6 +61,14 @@
   border: 0;
 }
 
+.form .btn {
+  justify-self: start;
+}
+
+main > section + section {
+  margin-top: var(--space-8);
+}
+
 @media (max-width: 48rem) {
   .spots-layout {
     grid-template-columns: 1fr;
