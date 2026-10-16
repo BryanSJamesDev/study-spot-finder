@@ -121,10 +121,23 @@
           <!-- Form error message -->
           <p id="form-error" class="field__error" role="alert"></p>
 
-          <!-- Submit button -->
-          <button type="submit" id="form-submit" class="btn btn--primary">
-            Save spot
-          </button>
+          <!-- Form buttons -->
+          <div class="form__actions">
+            <!-- Submit button -->
+            <button type="submit" id="form-submit" class="btn btn--primary">
+              Save spot
+            </button>
+
+            <!-- Cancel button hidden by default -->
+            <button
+              type="button"
+              id="form-cancel"
+              class="btn btn--secondary"
+              hidden
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </section>
     </main>

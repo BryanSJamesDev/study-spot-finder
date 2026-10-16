@@ -24,6 +24,9 @@ async function init() {
 
   // Adds event listener for a submission of a form whether its enter or a click
   document.querySelector("#spot-form").addEventListener("submit", handleSubmit);
+
+  // Adds event listener for the cancel button
+  document.querySelector("#form-cancel").addEventListener("click", stopEditing);
 }
 
 /** Creates a card and returns it */
@@ -168,11 +171,8 @@ async function handleSubmit(event) {
       return;
     }
 
-    // Leave edit mode
-    editingId = null;
-
-    // If successful, clear the form
-    event.target.reset();
+    // Leave edit mode and reset the form
+    stopEditing();
 
     // Reload and display the updated spots
     renderSpots(await loadSpots());
@@ -226,8 +226,32 @@ function startEditing(spot) {
   // Remember which spot is being edited
   editingId = spot._id;
 
+  // Change the form title and submit button for editing
+  document.querySelector("#form-title").textContent = `Edit ${spot.name}`;
+  document.querySelector("#form-submit").textContent = "Save changes";
+
+  // Show the cancel button
+  document.querySelector("#form-cancel").hidden = false;
   // Scroll the form into view
   form.scrollIntoView({ behavior: "smooth" });
 }
 
+/** Stops editing and resets the form */
+function stopEditing() {
+  // Stop editing the current spot
+  editingId = null;
+
+  // Reset the form fields
+  document.querySelector("#spot-form").reset();
+
+  // Restore the original form title and submit button
+  document.querySelector("#form-title").textContent = "Add a study spot";
+  document.querySelector("#form-submit").textContent = "Save spot";
+
+  // Hide the cancel button
+  document.querySelector("#form-cancel").hidden = true;
+
+  // Clear any existing error message
+  document.querySelector("#form-error").textContent = "";
+}
 init();
