@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { formatClosingTime } from "../public/js/spotUtils.js";
+import { formatClosingTime, getSpotTags } from "../public/js/spotUtils.js";
 
 /** Test that normal times format correctly. */
 test("formatClosingTime formats normal times", () => {
@@ -71,4 +71,17 @@ test("formatClosingTime handles invalid time formats", () => {
   for (const input of invalidCases) {
     assert.equal(formatClosingTime(input), "Hours unknown");
   }
+});
+
+/** Test that a spot with all tags returns them in the correct order. */
+test("getSpotTags returns all tags in the correct order", () => {
+  // Create a spot with outlets, Wi-Fi, and a custom tag
+  const spot = {
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone"],
+  };
+
+  // Check that all tags are returned in the correct order
+  assert.deepEqual(getSpotTags(spot), ["Outlets", "Wi-Fi", "quiet zone"]);
 });
