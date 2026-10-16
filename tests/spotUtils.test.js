@@ -43,3 +43,32 @@ test("formatClosingTime handles missing input", () => {
     assert.equal(formatClosingTime(input), "Hours unknown");
   }
 });
+
+/** Test that inputs with the wrong type return Hours unknown. */
+test("formatClosingTime handles incorrect input types", () => {
+  // Create test cases for numbers, booleans, objects, and arrays
+  const invalidTypes = [2300, true, {}, ["23:00"]];
+
+  // Loop through invalid types and check that hours are reported as unknown
+  for (const input of invalidTypes) {
+    assert.equal(formatClosingTime(input), "Hours unknown");
+  }
+});
+
+/** Test that invalid time formats return Hours unknown. */
+test("formatClosingTime handles invalid time formats", () => {
+  // Create test cases for invalid times and formats
+  const invalidCases = [
+    "24:00",
+    "12:60",
+    "9:00",
+    "10pm",
+    " 10:00",
+    "9".repeat(10000),
+  ];
+
+  // Loop through invalid cases and check that hours are reported as unknown
+  for (const input of invalidCases) {
+    assert.equal(formatClosingTime(input), "Hours unknown");
+  }
+});
