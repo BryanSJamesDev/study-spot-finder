@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spots · Study Spot Finder</title>
+    <link rel="stylesheet" href="./css/shared.css" />
+    <link rel="stylesheet" href="./css/nav.css" />
+    <link rel="stylesheet" href="./css/spots.css" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav__inner container">
+        <a href="index.html" class="nav__brand">
+          Study Spot Finder
+          <small class="text-muted">Northeastern University</small>
+        </a>
+        <ul class="nav__links">
+          <li>
+            <a href="index.html" class="nav__link">Home</a>
+          </li>
+          <li>
+            <a href="spots.html" class="nav__link" aria-current="page">Spots</a>
+          </li>
+          <li><a href="ratings.html" class="nav__link">Ratings</a></li>
+          <li><a href="checkins.html" class="nav__link">Check-Ins</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>Find a spot that fits.</h1>
+      <p>
+        Explore campus spaces and narrow things down to your study essentials.
+      </p>
+      <section>
+        <h2>Study Spots</h2>
+        <div id="spot-list" class="spot-grid"></div>
+      </section>
+    </main>
+    <script type="module" src="./js/spots.js"></script>
+  </body>
+</html>
