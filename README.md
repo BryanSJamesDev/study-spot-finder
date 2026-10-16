@@ -3,8 +3,8 @@
 Find study spots on Northeastern's campus that match how you study.
 
 **Authors:** Eleah Burman and Bryan James
-**Class:** [CS5610 Web Development](CLASS_LINK_HERE), Northeastern University
-**Stack:** Node.js, Express, Vanilla ES6, MongoDB (Node driver), Google Maps JS API
+**Class:** [CS5610 Web Development](https://johnguerra.co/classes/webDevelopment_online_fall_2026/), Northeastern University
+**Stack:** Node.js, Express, Vanilla ES6, MongoDB (Node driver), Leaflet with OpenStreetMap
 **Design:** [Figma file](https://www.figma.com/design/gAZKaGijIlob4iAr49KcYV/Untitled)
 **Design document:** [docs/design-document.md](docs/design-document.md)
 **Deployed site:** _coming soon_
@@ -40,7 +40,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     ├── LICENSE                # MIT
     ├── README.md              # Both (see rules below)
     ├── docs/
-    │   ├── design-document.md # Eleah (project description, personas, stories, mockups)
+    │   ├── design-document.md # Both (project description, personas, stories, mockups)
     │   └── images/
     │       └── mockups.png
     ├── routes/
@@ -53,6 +53,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     ├── seed/                  # Each person seeds their own collection
     ├── tests/
     │   ├── db.test.js         # Eleah
+    │   ├── spots.test.js      # Eleah
     │   ├── knn.test.js        # Eleah
     │   └── forecast.test.js   # Bryan
     └── public/
@@ -82,7 +83,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
 | Routes      | `/api/spots`                                                        | `/api/ratings`, `/api/checkins`                                  |
 | Pages       | `index.html`, `spots.html`                                          | `ratings.html`, `checkins.html`                                  |
 | Algorithm   | KNN recommender (`ml/knn.js`)                                       | Crowd forecast (`ml/forecast.js`)                                |
-| Extras      | Google Maps, filters                                                | Average rating, "crowded now"                                    |
+| Extras      | Leaflet map, filters                                                | Average rating, "crowded now"                                    |
 | Styles      | All CSS files                                                       | Uses classes from the CSS files                                  |
 | Setup       | `server.js`, `db.js`, route mounting, nav, license, Prettier/ESLint | Dependencies, `.gitignore`, `ratings.js` and `checkins.js` stubs |
 
@@ -136,8 +137,8 @@ Colors, fonts, and spacing are CSS variables in `:root` in `shared.css` (for exa
 
 1. Always `git pull origin main` before starting.
 2. Work on your own branch: `eleah/feature-name` or `bryan/feature-name`.
-3. Before committing, run `npm run format` and `npm run lint`. Fix any lint errors.
-4. Open a pull request into `main`. The other person gives it a quick look (this counts as our code review).
+3. Before committing, run `npm run format`, `npm run lint`, and `npm test`. Fix any errors.
+4. Open a pull request into `main`. The other person gives it a quick look.
 5. Never push straight to `main`.
 6. **New dependency?** Discuss it with the other person first. Include the `package.json` and `package-lock.json` changes in the same PR as the code that needs them.
 7. **README edits:** Only check off your own boxes below. Bigger README changes go in their own PR.
@@ -166,12 +167,11 @@ Each person makes their own `.env` file in the project root. It's gitignored and
 
     MONGO_URI=your-connection-string-here
     PORT=3000
-    GOOGLE_MAPS_KEY=
 
 - Get the connection string from Bryan, then swap in your own database username and password.
 - Use your own database user. Never share passwords in the repo or chat.
 - Bryan manages database users and Network Access in Atlas.
-- Eleah adds `GOOGLE_MAPS_KEY` when she starts the map and lets Bryan know. The key needs the **Maps JavaScript API** enabled. Because it's visible in the browser, restrict it to your site's URLs in Google Cloud Console.
+- The map uses Leaflet with OpenStreetMap, which needs no API key.
 
 **Database name:** `studySpotFinder`
 
@@ -179,25 +179,29 @@ Each person makes their own `.env` file in the project root. It's gitignored and
 
 ## Data Model
 
-Agree on these before building routes. Ratings and check-ins reference spots by **name**, so spot names must be unique. **All three collections need full CRUD** (create, read, update, delete).
+Ratings and check-ins reference spots by **name**, so spot names must be unique. **All three collections need full CRUD** (create, read, update, delete). Full field details are in the [design document](docs/design-document.md).
 
-| Collection | Fields                                                                                                                  |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `spots`    | `name` (unique), `noiseLevel`, `outlets` (true/false), `wifi` (true/false), `closingTime`, `tags` (array), `lat`, `lng` |
-| `ratings`  | `spotName`, `stars` (1 to 5), `createdAt`                                                                               |
-| `checkins` | `spotName`, `crowdLevel`, `day`, `hour`, `note` (optional), `createdAt`                                                 |
+| Collection | Fields                                                                                                                            |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `spots`    | `name` (required, unique), `building` (required), `noiseLevel` (required), `outlets`, `wifi`, `closingTime`, `tags`, `lat`, `lng` |
+| `ratings`  | `spotName`, `stars` (1 to 5), `createdAt`                                                                                         |
+| `checkins` | `spotName`, `crowdLevel`, `day`, `hour`, `note` (optional), `createdAt`                                                           |
 
-**To decide together:**
+**Decisions:**
 
-- What scale is `noiseLevel` (e.g. 1 to 3, or "quiet / moderate / loud")?
-- What scale is `crowdLevel`? The Figma design uses "Not busy / Moderate / Very busy."
-- The Figma design adds a `building` / location field on spots and an optional written `review` on ratings. Add them?
-- If a spot is renamed, do its ratings and check-ins get updated too?
-- With no user accounts, how does someone edit or delete "their" rating or check-in?
+- `noiseLevel` is Quiet, Moderate, or Loud.
+- `crowdLevel` is Not busy, Moderate, or Very busy.
+- Spots have a required `building` field.
+- If a spot is renamed or deleted, its ratings and check-ins are left as they are.
+- Anyone can edit or delete a rating or check-in (no user accounts).
+
+**Still to decide:**
+
+- Whether ratings get an optional written `review` field.
 
 ---
 
-## API Endpoints (planned)
+## API Endpoints
 
 | Method           | Endpoint            | Owner |
 | ---------------- | ------------------- | ----- |
@@ -207,6 +211,8 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 | GET, PUT, DELETE | `/api/ratings/:id`  | Bryan |
 | GET, POST        | `/api/checkins`     | Bryan |
 | GET, PUT, DELETE | `/api/checkins/:id` | Bryan |
+
+Errors are returned as `{ "error": "message" }` with status `400` (bad input), `404` (not found), `409` (duplicate), or `500` (server error).
 
 ---
 
@@ -226,13 +232,13 @@ Agree on these before building routes. Ratings and check-ins reference spots by 
 - [x] MIT license
 - [x] ESLint config, zero lint errors
 - [x] Prettier formatting
+- [x] CSS organized by module
 - [ ] At least 2 MongoDB collections with full CRUD (we have 3)
 - [ ] Client-side rendering with vanilla JS (no template engines)
-- [ ] CSS organized by module
 - [ ] 1,000+ database records (via seed scripts)
 - [ ] Publicly deployed
 - [ ] Narrated public demo video
-- [ ] Code review (pull requests)
+- [ ] Code review
 - [ ] README: authors, class link, objective, screenshot, build instructions
 - [ ] Code frozen 24 hours before class
 - [ ] Final submission form with thumbnail
@@ -248,7 +254,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 - [x] **Bryan:** `npm init`, install dependencies (`express`, `mongodb`, `dotenv`), `.gitignore`, push to `main`
 - [x] **Bryan:** `.DS_Store` cleanup
 - [x] **Bryan:** Stubs in `routes/ratings.js` and `routes/checkins.js`
-- [x] **Eleah:** `db.js` with `connectDB()` and `getDB()`
+- [x] **Eleah:** `db.js` with `connectDB()`, `getDB()`, and `closeDB()`
 - [x] **Eleah:** `server.js` with Express, JSON, static `public` folder, connects before listening
 - [x] **Eleah:** `package.json` set to ES modules, scripts added
 - [x] **Eleah:** All three routers mounted in `server.js`
@@ -260,11 +266,12 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 ### Phase 1: Backend (full CRUD)
 
-- [ ] **Both:** Agree on the data model above and the API response format
-- [ ] **Eleah:** `spots` CRUD routes in `routes/spots.js`
+- [x] **Both:** Agree on the data model and the API response format
+- [x] **Eleah:** `spots` CRUD routes in `routes/spots.js`
+- [x] **Eleah:** Route tests in `tests/spots.test.js`
 - [ ] **Bryan:** `ratings` CRUD routes and average rating in `routes/ratings.js`
 - [ ] **Bryan:** `checkins` CRUD routes and "crowded now" (last 2 hours) in `routes/checkins.js`
-- [ ] **Both:** Route tests for your own routes (success, invalid input, missing records)
+- [ ] **Bryan:** Route tests for ratings and check-ins
 
 ### Phase 2: Frontend (client-side rendering)
 
@@ -279,7 +286,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 ### Phase 4: Map and Algorithms
 
-- [ ] **Eleah:** Google Map limited to campus bounds
+- [ ] **Eleah:** Leaflet map limited to campus bounds, with click-to-set location
 - [ ] **Eleah:** KNN recommender in `ml/knn.js` with explanations, plus tests
 - [ ] **Bryan:** Weighted forecast in `ml/forecast.js`, plus tests
 
@@ -295,11 +302,9 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 ## What's Next
 
-**Bryan:** Pull `main`. Then start Phase 1 on a `bryan/ratings` branch in `routes/ratings.js`. Run `npm run format` and `npm run lint` before each commit.
+**Bryan:** Pull `main`. Then build `ratings` CRUD on a `bryan/ratings` branch in `routes/ratings.js`. `routes/spots.js` and `tests/spots.test.js` are working examples of the patterns (validation helper, error format, route tests). Run `npm run format`, `npm run lint`, and `npm test` before each commit.
 
-**Eleah:** `spots` CRUD routes on an `eleah/spots` branch.
-
-**Both:** Settle the "To decide together" questions in the Data Model section before writing CRUD routes.
+**Eleah:** `spots.html` and `js/spots.js` on an `eleah/spots-page` branch.
 
 ---
 
