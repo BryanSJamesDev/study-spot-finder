@@ -85,3 +85,16 @@ test("getSpotTags returns all tags in the correct order", () => {
   // Check that all tags are returned in the correct order
   assert.deepEqual(getSpotTags(spot), ["Outlets", "Wi-Fi", "quiet zone"]);
 });
+
+/** Test that a spot with no tags returns an empty array. */
+test("getSpotTags returns an empty array when a spot has no tags", () => {
+  // Create a spot without outlets, Wi-Fi, or custom tags
+  const spot = {
+    outlets: false,
+    wifi: false,
+    tags: [],
+  };
+
+  // Check that no tags are returned
+  assert.deepEqual(getSpotTags(spot), []);
+});
