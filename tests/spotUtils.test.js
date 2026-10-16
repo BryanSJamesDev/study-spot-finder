@@ -98,3 +98,14 @@ test("getSpotTags returns an empty array when a spot has no tags", () => {
   // Check that no tags are returned
   assert.deepEqual(getSpotTags(spot), []);
 });
+
+/** Test that a missing spot returns an empty array. */
+test("getSpotTags handles missing spots", () => {
+  // Create test cases for missing spots
+  const missingSpots = [null, undefined];
+
+  // Loop through missing spots and check that an empty array is returned
+  for (const spot of missingSpots) {
+    assert.deepEqual(getSpotTags(spot), []);
+  }
+});
