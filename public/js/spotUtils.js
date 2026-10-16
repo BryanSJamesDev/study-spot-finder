@@ -54,4 +54,19 @@ function getSpotTags(spot) {
   return tags;
 }
 
-export { formatClosingTime, getSpotTags };
+/** Parse tags so that they can be properly read */
+function parseTags(text) {
+  //If text isnt a string return an empty array
+  if (typeof text !== "string") {
+    return [];
+  }
+
+  // Cut the text at every comma, remove space and drop empty pieces
+  const result = text
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter((tag) => tag !== "");
+
+  return result;
+}
+export { formatClosingTime, getSpotTags, parseTags };
