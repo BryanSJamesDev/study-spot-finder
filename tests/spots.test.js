@@ -644,3 +644,83 @@ test("DELETE with invalid ID returns 400", async () => {
   const body = await res.json();
   assert.equal(body.error, "Invalid spot ID");
 });
+
+/**
+ * Test that GET one returns a 500 status when the database fails.
+ */
+test("GET one returns 500 when the database fails", async () => {
+  await closeDB();
+
+  try {
+    const res = await fetch(`${baseUrl}/000000000000000000000000`);
+
+    assert.equal(res.status, 500);
+
+    const body = await res.json();
+    assert.equal(body.error, "Failed to load spot");
+  } finally {
+    await connectDB();
+  }
+});
+
+/**
+ * Test that POST returns a 500 status when the database fails.
+ */
+test("POST returns 500 when the database fails", async () => {
+  await closeDB();
+
+  try {
+    const res = await postSpot({
+      name: "Test Spot for Database Failure",
+      building: "Snell Library",
+      noiseLevel: "Quiet",
+    });
+
+    assert.equal(res.status, 500);
+
+    const body = await res.json();
+    assert.equal(body.error, "Failed to create spot");
+  } finally {
+    await connectDB();
+  }
+});
+
+/**
+ * Test that PUT returns a 500 status when the database fails.
+ */
+test("PUT returns 500 when the database fails", async () => {
+  await closeDB();
+
+  try {
+    const res = await putSpot("000000000000000000000000", {
+      name: "Test Spot",
+      building: "Snell Library",
+      noiseLevel: "Quiet",
+    });
+
+    assert.equal(res.status, 500);
+
+    const body = await res.json();
+    assert.equal(body.error, "Failed to update spot");
+  } finally {
+    await connectDB();
+  }
+});
+
+/**
+ * Test that DELETE returns a 500 status when the database fails.
+ */
+test("DELETE returns 500 when the database fails", async () => {
+  await closeDB();
+
+  try {
+    const res = await deleteSpot("000000000000000000000000");
+
+    assert.equal(res.status, 500);
+
+    const body = await res.json();
+    assert.equal(body.error, "Failed to delete spot");
+  } finally {
+    await connectDB();
+  }
+});
