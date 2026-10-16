@@ -132,3 +132,15 @@ test("getSpotTags filters out invalid tags", () => {
   // Check that only valid, non-empty string tags are returned
   assert.deepEqual(getSpotTags(spot), ["quiet"]);
 });
+
+/** Test that tags that are not a list are ignored. */
+test("getSpotTags ignores tags that are not an array", () => {
+  // Create a spot with outlets and an invalid tags value
+  const spot = {
+    outlets: true,
+    tags: "quiet",
+  };
+
+  // Check that the outlet tag is returned and invalid tags are ignored
+  assert.deepEqual(getSpotTags(spot), ["Outlets"]);
+});
