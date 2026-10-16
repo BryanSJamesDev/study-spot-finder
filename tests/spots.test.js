@@ -131,6 +131,11 @@ function putSpot(id, data) {
   });
 }
 
+// Helper function to send DELETE requests with spot data
+function deleteSpot(id) {
+  return fetch(`${baseUrl}/${id}`, { method: "DELETE" });
+}
+
 /** Test a valid spot returns 201 and trims extra spaces. */
 test("valid spot returns 201", async () => {
   const res = await postSpot({
@@ -563,4 +568,79 @@ test("PUT replaces the whole spot", async () => {
         });
     }
   }
+});
+
+/**
+ * Test that deleting a spot returns 204 and removes it from the database.
+ */
+test("deleting a spot returns 204 and removes it", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Delete",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+  const created = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+
+    const deleteRes = await deleteSpot(created._id);
+    assert.equal(deleteRes.status, 204);
+
+    const getRes = await fetch(`${baseUrl}/${created._id}`);
+    assert.equal(getRes.status, 404);
+  } finally {
+    if (created._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({
+          _id: new ObjectId(created._id),
+        });
+    }
+  }
+});
+
+/**
+ * Test that deleting a spot twice returns 404 on the second attempt.
+ */
+test("deleting a spot twice returns 404 the second time", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Double Delete",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+  const created = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+
+    const firstDelete = await deleteSpot(created._id);
+    assert.equal(firstDelete.status, 204);
+
+    const secondDelete = await deleteSpot(created._id);
+    assert.equal(secondDelete.status, 404);
+
+    const body = await secondDelete.json();
+    assert.equal(body.error, "Spot not found");
+  } finally {
+    if (created._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({
+          _id: new ObjectId(created._id),
+        });
+    }
+  }
+});
+
+/**
+ * Test that deleting with an invalid ID returns a 400 status.
+ */
+test("DELETE with invalid ID returns 400", async () => {
+  const res = await deleteSpot("hello");
+
+  assert.equal(res.status, 400);
+
+  const body = await res.json();
+  assert.equal(body.error, "Invalid spot ID");
 });
