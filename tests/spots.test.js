@@ -475,3 +475,92 @@ test("PUT with invalid data returns 400", async () => {
   assert.match(body.error, /Building is required/);
   assert.match(body.error, /Noise level/);
 });
+
+/**
+ * Test that renaming a spot to another spot's name returns a 409 status.
+ */
+test("renaming a spot to another spot's name returns 409", async () => {
+  const resA = await postSpot({
+    name: "Test Spot A",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+  const a = await resA.json();
+
+  const resB = await postSpot({
+    name: "Test Spot B",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+  const b = await resB.json();
+
+  try {
+    assert.equal(resA.status, 201);
+    assert.equal(resB.status, 201);
+
+    const res = await putSpot(b._id, {
+      name: "Test Spot A",
+      building: "Snell Library",
+      noiseLevel: "Quiet",
+    });
+
+    assert.equal(res.status, 409);
+
+    const body = await res.json();
+    assert.equal(body.error, "A spot with that name already exists");
+  } finally {
+    if (a._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({
+          _id: new ObjectId(a._id),
+        });
+    }
+
+    if (b._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({
+          _id: new ObjectId(b._id),
+        });
+    }
+  }
+});
+
+/**
+ * Test that PUT replaces the whole spot, resetting omitted optional fields.
+ */
+test("PUT replaces the whole spot", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Replacement",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+    tags: ["quiet zone"],
+    outlets: true,
+  });
+  const created = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+
+    const updateRes = await putSpot(created._id, {
+      name: "Test Spot for Replacement",
+      building: "Snell Library",
+      noiseLevel: "Moderate",
+    });
+
+    assert.equal(updateRes.status, 200);
+
+    const body = await updateRes.json();
+    assert.deepEqual(body.tags, []);
+    assert.equal(body.outlets, false);
+  } finally {
+    if (created._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({
+          _id: new ObjectId(created._id),
+        });
+    }
+  }
+});
