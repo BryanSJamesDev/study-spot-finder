@@ -1,8 +1,16 @@
-import { formatClosingTime, getSpotTags, parseTags } from "./spotUtils.js";
+import {
+  formatClosingTime,
+  getSpotTags,
+  parseTags,
+  filterSpots,
+} from "./spotUtils.js";
 
 /** Global variables */
 // The ID of the spot being edited, or null when adding a new spot
 let editingId = null;
+
+// Every spot from the database, before filtering
+let allSpots = [];
 
 /* Helper function to load spots */
 async function loadSpots() {
@@ -17,16 +25,50 @@ async function loadSpots() {
   return await res.json();
 }
 
+/** Reads the current filter form values */
+function getFilters() {
+  // Read the filter fields
+  const data = new FormData(document.querySelector("#filter-form"));
+
+  // Return the filter values
+  return {
+    search: data.get("search"),
+    noiseLevel: data.get("noiseLevel"),
+    outlets: data.get("outlets") === "on",
+    wifi: data.get("wifi") === "on",
+    tag: data.get("tag"),
+  };
+}
+
+/** Filters and displays the matching spots */
+function applyFilters() {
+  renderSpots(filterSpots(allSpots, getFilters()));
+}
+
+/** Reloads spots and applies the current filters */
+async function refreshSpots() {
+  // Load every spot from the database
+  allSpots = await loadSpots();
+
+  // Display only the spots that match the filters
+  applyFilters();
+}
+
 /* Starts the page */
 async function init() {
-  const spots = await loadSpots();
-  renderSpots(spots);
+  // Load and display the spots
+  await refreshSpots();
 
   // Adds event listener for a submission of a form whether its enter or a click
   document.querySelector("#spot-form").addEventListener("submit", handleSubmit);
 
   // Adds event listener for the cancel button
   document.querySelector("#form-cancel").addEventListener("click", stopEditing);
+
+  // Re-filter the spots whenever a filter changes
+  const filterForm = document.querySelector("#filter-form");
+  filterForm.addEventListener("input", applyFilters);
+  filterForm.addEventListener("reset", () => setTimeout(applyFilters));
 }
 
 /** Creates a card and returns it */
@@ -99,6 +141,7 @@ function createSpotCard(spot) {
   // Add the delete button to the actions, and the actions to the card
   actions.append(deleteButton);
   card.append(actions);
+
   // Return the completed card
   return card;
 }
@@ -111,11 +154,14 @@ function renderSpots(spots) {
   // Clear the list before rendering spots
   list.replaceChildren();
 
-  // If there are no spots, display a message
+  // If there are no matching spots, display a message
   if (spots.length === 0) {
     const message = document.createElement("p");
     message.className = "text-muted";
-    message.textContent = "No spots yet. Add the first one below.";
+    message.textContent =
+      allSpots.length === 0
+        ? "No spots yet. Add the first one below."
+        : "No spots match your filters.";
     list.append(message);
     return;
   }
@@ -174,8 +220,8 @@ async function handleSubmit(event) {
     // Leave edit mode and reset the form
     stopEditing();
 
-    // Reload and display the updated spots
-    renderSpots(await loadSpots());
+    // Reload spots and keep the current filters applied
+    await refreshSpots();
   } catch (error) {
     // Log the error and display a message if the request fails
     console.error("Failed to save spot", error);
@@ -200,8 +246,8 @@ async function deleteSpot(spot) {
       return;
     }
 
-    // Rerender spots so the deleted spot disappears
-    renderSpots(await loadSpots());
+    // Reload spots and keep the current filters applied
+    await refreshSpots();
   } catch (error) {
     // Log the error and display a message if the request fails
     console.error(`Couldn't delete ${spot.name}. Please try again.`, error);
@@ -232,6 +278,7 @@ function startEditing(spot) {
 
   // Show the cancel button
   document.querySelector("#form-cancel").hidden = false;
+
   // Scroll the form into view
   form.scrollIntoView({ behavior: "smooth" });
 }
@@ -254,4 +301,5 @@ function stopEditing() {
   // Clear any existing error message
   document.querySelector("#form-error").textContent = "";
 }
+
 init();
