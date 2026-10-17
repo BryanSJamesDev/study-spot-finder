@@ -33,6 +33,49 @@
       <p>
         Explore campus spaces and narrow things down to your study essentials.
       </p>
+      <section class="panel">
+        <h2>Filter spots</h2>
+        <form id="filter-form" class="form">
+          <div class="field">
+            <label for="filter-search" class="field__label"
+              >Search by name or building</label
+            >
+            <input
+              type="search"
+              id="filter-search"
+              name="search"
+              class="input"
+            />
+          </div>
+
+          <div class="field">
+            <label for="filter-noise" class="field__label">Noise level</label>
+            <select id="filter-noise" name="noiseLevel" class="select">
+              <option value="">Any noise level</option>
+              <option value="Quiet">Quiet</option>
+              <option value="Moderate">Moderate</option>
+              <option value="Loud">Loud</option>
+            </select>
+          </div>
+
+          <div class="field field--checkbox">
+            <input type="checkbox" id="filter-outlets" name="outlets" />
+            <label for="filter-outlets">Has outlets</label>
+          </div>
+
+          <div class="field field--checkbox">
+            <input type="checkbox" id="filter-wifi" name="wifi" />
+            <label for="filter-wifi">Has Wi-Fi</label>
+          </div>
+
+          <div class="field">
+            <label for="filter-tag" class="field__label">Tag</label>
+            <input type="text" id="filter-tag" name="tag" class="input" />
+          </div>
+
+          <button type="reset" class="btn btn--secondary">Clear filters</button>
+        </form>
+      </section>
       <section>
         <h2>Study Spots</h2>
         <div id="spot-list" class="spot-grid"></div>
