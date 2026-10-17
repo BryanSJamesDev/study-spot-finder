@@ -69,4 +69,59 @@ function parseTags(text) {
 
   return result;
 }
-export { formatClosingTime, getSpotTags, parseTags };
+
+/** Filters spots based on search, noise level, outlets, wifi, and tag */
+function filterSpots(spots, filters) {
+  // Handle if spots is not an array and a bad input
+  if (!Array.isArray(spots)) {
+    return [];
+  }
+
+  // Handle missing filters
+  const f = filters ?? {};
+
+  // Return spots that match all selected filters
+  return spots.filter((spot) => {
+    // Check the search filter against the name and building
+    if (typeof f.search === "string" && f.search.trim() !== "") {
+      const search = f.search.trim().toLowerCase();
+      const name = typeof spot.name === "string" ? spot.name.toLowerCase() : "";
+      const building =
+        typeof spot.building === "string" ? spot.building.toLowerCase() : "";
+
+      if (!name.includes(search) && !building.includes(search)) {
+        return false;
+      }
+    }
+
+    // Check the noise level filter
+    if (f.noiseLevel && spot.noiseLevel !== f.noiseLevel) {
+      return false;
+    }
+
+    // Check the outlets filter
+    if (f.outlets === true && spot.outlets !== true) {
+      return false;
+    }
+
+    // Check the wifi filter
+    if (f.wifi === true && spot.wifi !== true) {
+      return false;
+    }
+
+    // Check the tag filter
+    if (typeof f.tag === "string" && f.tag.trim() !== "") {
+      const tag = f.tag.trim().toLowerCase();
+      const tags = Array.isArray(spot.tags) ? spot.tags : [];
+
+      if (!tags.some((t) => typeof t === "string" && t.toLowerCase() === tag)) {
+        return false;
+      }
+    }
+
+    // Keep the spot if it passes every filter
+    return true;
+  });
+}
+
+export { formatClosingTime, getSpotTags, parseTags, filterSpots };
