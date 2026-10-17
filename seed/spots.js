@@ -1,0 +1,252 @@
+import { connectDB, getDB, closeDB } from "../db.js";
+
+/** GLOBAL VARIABLES */
+
+// Real Northeastern study spots to seed the database with
+const SEED_SPOTS = [
+  {
+    name: "Snell Quiet Floor",
+    building: "Snell Library, 4th floor",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    closingTime: "23:00",
+    tags: ["quiet zone"],
+    lat: 42.3381,
+    lng: -71.0878,
+  },
+  {
+    name: "Snell Group Study Area",
+    building: "Snell Library, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: true,
+    wifi: true,
+    closingTime: "23:00",
+    tags: ["group study", "whiteboards"],
+    lat: 42.3382,
+    lng: -71.088,
+  },
+  {
+    name: "Snell Café Tables",
+    building: "Snell Library, 1st floor",
+    noiseLevel: "Loud",
+    outlets: false,
+    wifi: true,
+    closingTime: "21:00",
+    tags: ["coffee nearby"],
+    lat: 42.338,
+    lng: -71.0877,
+  },
+  {
+    name: "Curry Student Center Lounge",
+    building: "Curry Student Center, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: true,
+    wifi: true,
+    closingTime: "22:00",
+    tags: ["group study", "couches"],
+    lat: 42.339,
+    lng: -71.0874,
+  },
+  {
+    name: "Curry Quiet Room",
+    building: "Curry Student Center, 3rd floor",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    closingTime: "22:00",
+    tags: ["quiet zone"],
+    lat: 42.3391,
+    lng: -71.0875,
+  },
+  {
+    name: "Afterhours Booths",
+    building: "Curry Student Center, lower level",
+    noiseLevel: "Loud",
+    outlets: true,
+    wifi: true,
+    closingTime: "23:59",
+    tags: ["open late", "booths"],
+    lat: 42.3389,
+    lng: -71.0873,
+  },
+  {
+    name: "ISEC Atrium",
+    building: "ISEC, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: false,
+    wifi: true,
+    tags: ["natural light", "spacious"],
+    lat: 42.3377,
+    lng: -71.0869,
+  },
+  {
+    name: "ISEC Study Pods",
+    building: "ISEC, 2nd floor",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    closingTime: "22:00",
+    tags: ["natural light", "quiet zone"],
+    lat: 42.3378,
+    lng: -71.0868,
+  },
+  {
+    name: "EXP Collaboration Space",
+    building: "EXP, 2nd floor",
+    noiseLevel: "Moderate",
+    outlets: true,
+    wifi: true,
+    closingTime: "22:00",
+    tags: ["group study", "whiteboards"],
+    lat: 42.3373,
+    lng: -71.0872,
+  },
+  {
+    name: "Egan Lobby",
+    building: "Egan Research Center, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: true,
+    wifi: true,
+    closingTime: "21:00",
+    tags: ["big tables"],
+    lat: 42.3378,
+    lng: -71.0889,
+  },
+  {
+    name: "Shillman Study Lounge",
+    building: "Shillman Hall, 2nd floor",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    closingTime: "21:00",
+    tags: ["quiet zone"],
+    lat: 42.3375,
+    lng: -71.0901,
+  },
+  {
+    name: "Richards Hall Classrooms",
+    building: "Richards Hall, 2nd floor",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    closingTime: "20:00",
+    tags: ["whiteboards"],
+    lat: 42.3404,
+    lng: -71.0884,
+  },
+  {
+    name: "Dodge Hall Corner",
+    building: "Dodge Hall, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: false,
+    wifi: true,
+    closingTime: "20:00",
+    tags: ["cozy"],
+    lat: 42.3404,
+    lng: -71.0875,
+  },
+  {
+    name: "Ell Hall Lobby",
+    building: "Ell Hall, 1st floor",
+    noiseLevel: "Loud",
+    outlets: false,
+    wifi: true,
+    closingTime: "21:00",
+    tags: ["spacious"],
+    lat: 42.3396,
+    lng: -71.0878,
+  },
+  {
+    name: "Behrakis Study Tables",
+    building: "Behrakis Health Sciences Center, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: true,
+    wifi: true,
+    closingTime: "21:00",
+    tags: ["big tables", "natural light"],
+    lat: 42.3367,
+    lng: -71.0912,
+  },
+  {
+    name: "Ryder Hall Lounge",
+    building: "Ryder Hall, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: true,
+    wifi: true,
+    closingTime: "21:00",
+    tags: ["couches"],
+    lat: 42.3367,
+    lng: -71.0905,
+  },
+  {
+    name: "Marino Center Seating",
+    building: "Marino Recreation Center, 2nd floor",
+    noiseLevel: "Loud",
+    outlets: false,
+    wifi: true,
+    closingTime: "23:00",
+    tags: ["open late"],
+    lat: 42.3404,
+    lng: -71.0903,
+  },
+  {
+    name: "West Village H Lounge",
+    building: "West Village H, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: true,
+    wifi: true,
+    closingTime: "23:59",
+    tags: ["open late", "group study"],
+    lat: 42.3383,
+    lng: -71.0925,
+  },
+  {
+    name: "International Village Study Room",
+    building: "International Village, 2nd floor",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    closingTime: "23:59",
+    tags: ["quiet zone", "open late"],
+    lat: 42.3352,
+    lng: -71.0893,
+  },
+  {
+    name: "Mugar Life Sciences Benches",
+    building: "Mugar Life Sciences, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: false,
+    wifi: true,
+    closingTime: "20:00",
+    tags: ["natural light"],
+    lat: 42.3395,
+    lng: -71.087,
+  },
+];
+
+/** Adds the sample spots to the database */
+async function seedSpots() {
+  try {
+    // Connect to the database
+    await connectDB();
+
+    // Add each seed spot or update it if it already exists
+    for (const spot of SEED_SPOTS) {
+      await getDB()
+        .collection("spots")
+        .updateOne({ name: spot.name }, { $set: spot }, { upsert: true });
+    }
+
+    // Log how many spots were seeded
+    console.log(`Seeded ${SEED_SPOTS.length} spots.`);
+  } catch (error) {
+    // Log any errors that occur
+    console.error("Failed to seed spots", error);
+  } finally {
+    // Close the database connection
+    await closeDB();
+  }
+}
+
+seedSpots();
