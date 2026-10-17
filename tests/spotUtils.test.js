@@ -274,3 +274,61 @@ test("filterSpots filters by noise level", () => {
   // Check that only spots with Moderate noise are returned
   assert.deepEqual(names, ["Curry Lounge", "ISEC Atrium"]);
 });
+
+/** Test that outlets and Wi-Fi filters return matching spots. */
+test("filterSpots filters by outlets and wifi", () => {
+  // Create test cases for outlets and Wi-Fi
+  const cases = [
+    [{ outlets: true }, ["Snell Quiet Floor", "Curry Lounge"]],
+    [{ wifi: true }, ["Snell Quiet Floor", "ISEC Atrium"]],
+    [
+      { outlets: false, wifi: false },
+      ["Snell Quiet Floor", "Curry Lounge", "ISEC Atrium"],
+    ],
+  ];
+
+  // Loop through test cases and check that the correct spots are returned
+  for (const [filters, expected] of cases) {
+    const names = filterSpots(sampleSpots, filters).map((spot) => spot.name);
+    assert.deepEqual(names, expected);
+  }
+});
+
+/** Test that the tag filter ignores case and extra spaces. */
+test("filterSpots filters by tag ignoring case and spaces", () => {
+  // Create test cases for tag searches
+  const cases = [
+    [{ tag: "group study" }, ["Curry Lounge"]],
+    [{ tag: "  QUIET ZONE  " }, ["Snell Quiet Floor"]],
+  ];
+
+  // Loop through test cases and check that the correct spots are returned
+  for (const [filters, expected] of cases) {
+    const names = filterSpots(sampleSpots, filters).map((spot) => spot.name);
+    assert.deepEqual(names, expected);
+  }
+});
+
+/** Test that multiple filters are applied together. */
+test("filterSpots combines multiple filters", () => {
+  // Filter for Moderate noise level and Wi-Fi
+  const names = filterSpots(sampleSpots, {
+    noiseLevel: "Moderate",
+    wifi: true,
+  }).map((spot) => spot.name);
+
+  // Check that only spots matching both filters are returned
+  assert.deepEqual(names, ["ISEC Atrium"]);
+});
+
+/** Test that filters return an empty array when no spots match. */
+test("filterSpots returns no spots when nothing matches", () => {
+  // Search for a library with Loud noise
+  const names = filterSpots(sampleSpots, {
+    search: "library",
+    noiseLevel: "Loud",
+  }).map((spot) => spot.name);
+
+  // Check that no spots match both filters
+  assert.deepEqual(names, []);
+});
