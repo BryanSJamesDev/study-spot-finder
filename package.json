@@ -1,7 +1,7 @@
 {
   "name": "study-spot-finder",
   "version": "1.0.0",
-  "description": "",
+  "description": "Find study spots on Northeastern's campus that match how you study",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,10 +9,11 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "node --test"
+    "test": "node --test",
+    "seed:spots": "node seed/spots.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Eleah Burman and Bryan James",
   "license": "MIT",
   "type": "module",
   "dependencies": {
