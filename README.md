@@ -20,6 +20,21 @@ A web app that helps students find study spots on campus that match their prefer
 
 ---
 
+## Schedule
+
+**Due: Tuesday, October 20 at 2:59 PM.** Code freezes 24 hours before class, so all code must be merged by **Monday, October 19 at 2:59 PM**.
+
+| When                                | Eleah                                            | Bryan                                                          |
+| ----------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
+| **Saturday, Oct 17**                | Spots seed script, first deployment, Leaflet map | `checkins` CRUD routes and tests, Ratings page, Check-Ins page |
+| **Sunday, Oct 18**                  | KNN recommender, styling pass                    | Ratings and check-ins seed scripts, crowd forecast             |
+| **Monday, Oct 19 (before 2:59 PM)** | Screenshot, README, final fixes                  | Final fixes                                                    |
+| **Monday, Oct 19 (after freeze)**   | Demo video and submission form (both)            | Demo video and submission form (both)                          |
+
+If something is running late, say so in Slack right away so the other person can plan around it.
+
+---
+
 ## Golden Rule
 
 **Only directly edit files you own.** If a change is needed in someone else's file, message them first and agree on who makes it.
@@ -56,6 +71,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     │   ├── spots.test.js      # Eleah
     │   ├── spotUtils.test.js  # Eleah
     │   ├── knn.test.js        # Eleah
+    │   ├── ratings.test.js    # Bryan
     │   └── forecast.test.js   # Bryan
     └── public/
         ├── index.html         # Eleah (shared, nav links to all pages)
@@ -70,7 +86,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
         │   └── checkins.css   # Eleah
         └── js/
             ├── spots.js       # Eleah
-            ├── spotUtils.js   # Eleah (formatting and tag helpers)
+            ├── spotUtils.js   # Eleah (formatting, tag, and filter helpers)
             ├── map.js         # Eleah
             ├── ratings.js     # Bryan
             └── checkins.js    # Bryan
@@ -196,25 +212,23 @@ Ratings and check-ins reference spots by **name**, so spot names must be unique.
 - `noiseLevel` is Quiet, Moderate, or Loud.
 - `crowdLevel` is Not busy, Moderate, or Very busy.
 - Spots have a required `building` field.
+- Ratings are stars only, with no written review field.
 - If a spot is renamed or deleted, its ratings and check-ins are left as they are.
 - Anyone can edit or delete a rating or check-in (no user accounts).
-
-**Still to decide:**
-
-- Whether ratings get an optional written `review` field.
 
 ---
 
 ## API Endpoints
 
-| Method           | Endpoint            | Owner |
-| ---------------- | ------------------- | ----- |
-| GET, POST        | `/api/spots`        | Eleah |
-| GET, PUT, DELETE | `/api/spots/:id`    | Eleah |
-| GET, POST        | `/api/ratings`      | Bryan |
-| GET, PUT, DELETE | `/api/ratings/:id`  | Bryan |
-| GET, POST        | `/api/checkins`     | Bryan |
-| GET, PUT, DELETE | `/api/checkins/:id` | Bryan |
+| Method           | Endpoint                | Owner | Notes                                 |
+| ---------------- | ----------------------- | ----- | ------------------------------------- |
+| GET, POST        | `/api/spots`            | Eleah |                                       |
+| GET, PUT, DELETE | `/api/spots/:id`        | Eleah |                                       |
+| GET, POST        | `/api/ratings`          | Bryan | GET accepts an optional `?spotName=`  |
+| GET              | `/api/ratings/averages` | Bryan | Average stars and count for each spot |
+| GET, PUT, DELETE | `/api/ratings/:id`      | Bryan |                                       |
+| GET, POST        | `/api/checkins`         | Bryan |                                       |
+| GET, PUT, DELETE | `/api/checkins/:id`     | Bryan |                                       |
 
 Errors are returned as `{ "error": "message" }` with status `400` (bad input), `404` (not found), `409` (duplicate), or `500` (server error).
 
@@ -239,7 +253,7 @@ Errors are returned as `{ "error": "message" }` with status `400` (bad input), `
 - [x] CSS organized by module
 - [x] Client-side rendering with vanilla JS (no template engines)
 - [x] At least 1 form
-- [ ] At least 2 MongoDB collections with full CRUD (we have 3)
+- [x] At least 2 MongoDB collections with full CRUD (spots and ratings, check-ins in progress)
 - [ ] 1,000+ database records (via seed scripts)
 - [ ] Publicly deployed
 - [ ] Narrated public demo video
@@ -274,22 +288,23 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 - [x] **Both:** Agree on the data model and the API response format
 - [x] **Eleah:** `spots` CRUD routes in `routes/spots.js`
 - [x] **Eleah:** Route tests in `tests/spots.test.js`
-- [ ] **Bryan:** `ratings` CRUD routes and average rating in `routes/ratings.js`
-- [ ] **Bryan:** `checkins` CRUD routes and "crowded now" (last 2 hours) in `routes/checkins.js`
-- [ ] **Bryan:** Route tests for ratings and check-ins
+- [x] **Bryan:** `ratings` CRUD routes and average rating in `routes/ratings.js`
+- [x] **Bryan:** Route tests in `tests/ratings.test.js`
+- [ ] **Bryan:** `checkins` CRUD routes and "crowded now" (last 2 hours) in `routes/checkins.js`, plus tests
 
 ### Phase 2: Frontend (client-side rendering)
 
 - [x] **Eleah:** `spots.html` and `js/spots.js`: fetch from `/api/spots`, render cards, add/edit/delete form
 - [x] **Eleah:** `js/spotUtils.js` helpers with tests in `tests/spotUtils.test.js`
-- [ ] **Eleah:** Filters on the Spots page (noise, outlets, Wi-Fi, tags)
-- [ ] **Bryan:** `ratings.html` and `js/ratings.js`: star rating UI, average rating
+- [x] **Eleah:** Filters on the Spots page (noise, outlets, Wi-Fi, tags)
+- [ ] **Bryan:** `ratings.html` and `js/ratings.js`: star rating UI, average rating, spot dropdown
 - [ ] **Bryan:** `checkins.html` and `js/checkins.js`: check-in form, "crowded now"
 
 ### Phase 3: Data and Deployment
 
-- [ ] **Both:** Seed scripts in `seed/` for your own collections (1,000+ records total)
-- [ ] **Both:** Deploy early and confirm the live site connects to MongoDB
+- [ ] **Eleah:** Seed script for spots in `seed/`
+- [ ] **Bryan:** Seed scripts for ratings and check-ins in `seed/` (enough for 1,000+ records total)
+- [ ] **Eleah:** Deploy and confirm the live site connects to MongoDB
 
 ### Phase 4: Map and Algorithms
 
@@ -301,6 +316,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 - [ ] **Eleah:** Final styling pass
 - [ ] **Eleah:** Replace `confirm()` with a styled `<dialog>` for deleting spots
+- [ ] **Eleah:** Compact filter layout to match the Figma (search on top, other filters in one row)
 - [ ] **Both:** Screenshot, deployed URL, and video link in README
 - [ ] **Both:** Narrated demo video
 - [ ] **Both:** Freeze code 24 hours before class
@@ -310,9 +326,19 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 ## What's Next
 
-**Bryan:** Pull `main`. Then build `ratings` CRUD on a `bryan/ratings` branch in `routes/ratings.js`. `routes/spots.js` and `tests/spots.test.js` are working examples of the patterns (validation helper, error format, route tests). Run `npm run format`, `npm run lint`, and `npm test` before each commit.
+**Bryan (today, Saturday):**
 
-**Eleah:** Filters on the Spots page on an `eleah/spots-filters` branch.
+1. `checkins` CRUD routes and tests on a `bryan/checkins` branch
+2. Ratings page on a `bryan/ratings-page` branch. The ratings form should use a dropdown of existing spot names from `/api/spots`.
+3. Check-Ins page on a `bryan/checkins-page` branch
+
+`public/js/spots.js` and `public/js/spotUtils.js` are working examples of fetching, rendering, and testable helpers.
+
+**Eleah (today, Saturday):**
+
+1. Spots seed script
+2. First deployment
+3. Leaflet map on the Spots page
 
 ---
 
