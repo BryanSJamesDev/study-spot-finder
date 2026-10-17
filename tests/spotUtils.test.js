@@ -4,7 +4,36 @@ import {
   formatClosingTime,
   getSpotTags,
   parseTags,
+  filterSpots,
 } from "../public/js/spotUtils.js";
+
+// Sample spots for filterSpots tests
+const sampleSpots = [
+  {
+    name: "Snell Quiet Floor",
+    building: "Snell Library, 2nd floor",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone"],
+  },
+  {
+    name: "Curry Lounge",
+    building: "Curry Student Center",
+    noiseLevel: "Moderate",
+    outlets: true,
+    wifi: false,
+    tags: ["Group Study"],
+  },
+  {
+    name: "ISEC Atrium",
+    building: "ISEC, 1st floor",
+    noiseLevel: "Moderate",
+    outlets: false,
+    wifi: true,
+    tags: ["natural light"],
+  },
+];
 
 /** Test that normal times format correctly. */
 test("formatClosingTime formats normal times", () => {
@@ -201,4 +230,47 @@ test("parseTags handles 1000 tags", () => {
 
   // Check that all 1000 tags are returned
   assert.equal(parseTags(text).length, 1000);
+});
+
+/** Test that no filters returns every spot. */
+test("filterSpots returns all spots when no filters are provided", () => {
+  // Create test cases for empty, undefined, and null filters
+  const filters = [{}, undefined, null];
+
+  // Check that every spot is returned in the original order
+  for (const filter of filters) {
+    const names = filterSpots(sampleSpots, filter).map((spot) => spot.name);
+    assert.deepEqual(names, [
+      "Snell Quiet Floor",
+      "Curry Lounge",
+      "ISEC Atrium",
+    ]);
+  }
+});
+
+/** Test that search matches names and buildings regardless of case or spaces. */
+test("filterSpots searches names and buildings ignoring case and spaces", () => {
+  // Create test cases with search text and expected spot names
+  const cases = [
+    [{ search: "snell" }, ["Snell Quiet Floor"]],
+    [{ search: "student center" }, ["Curry Lounge"]],
+    [{ search: "  ISEC  " }, ["ISEC Atrium"]],
+  ];
+
+  // Loop through test cases and check that the correct spots are returned
+  for (const [filters, expected] of cases) {
+    const names = filterSpots(sampleSpots, filters).map((spot) => spot.name);
+    assert.deepEqual(names, expected);
+  }
+});
+
+/** Test that the noise level filter returns only matching spots. */
+test("filterSpots filters by noise level", () => {
+  // Filter spots by Moderate noise level
+  const names = filterSpots(sampleSpots, {
+    noiseLevel: "Moderate",
+  }).map((spot) => spot.name);
+
+  // Check that only spots with Moderate noise are returned
+  assert.deepEqual(names, ["Curry Lounge", "ISEC Atrium"]);
 });
