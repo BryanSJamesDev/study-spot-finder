@@ -57,7 +57,19 @@ async function refreshSpots() {
 /* Starts the page */
 async function init() {
   // Load and display the spots
-  await refreshSpots();
+  try {
+    await refreshSpots();
+  } catch (error) {
+    // Log the error and display a message
+    console.error("Failed to load spots", error);
+    const list = document.querySelector("#spot-list");
+    list.replaceChildren();
+
+    const message = document.createElement("p");
+    message.className = "text-muted";
+    message.textContent = "Couldn't load spots. Please refresh.";
+    list.append(message);
+  }
 
   // Adds event listener for a submission of a form whether its enter or a click
   document.querySelector("#spot-form").addEventListener("submit", handleSubmit);
