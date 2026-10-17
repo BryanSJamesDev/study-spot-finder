@@ -332,3 +332,57 @@ test("filterSpots returns no spots when nothing matches", () => {
   // Check that no spots match both filters
   assert.deepEqual(names, []);
 });
+
+/** Test that invalid spots input returns an empty array. */
+test("filterSpots handles invalid spots input", () => {
+  // Create test cases for invalid spots inputs
+  const invalidInputs = [null, undefined, "spots", {}];
+
+  // Check that each invalid input returns an empty array
+  for (const input of invalidInputs) {
+    assert.deepEqual(filterSpots(input, {}), []);
+  }
+});
+
+/** Test that filters with the wrong type are ignored. */
+test("filterSpots ignores filters with incorrect types", () => {
+  // Create test cases for filters with incorrect types
+  const filters = [{ search: 5 }, { tag: 5 }, { outlets: "yes" }];
+
+  // Check that each filter returns all three spots
+  for (const filter of filters) {
+    const names = filterSpots(sampleSpots, filter).map((spot) => spot.name);
+    assert.deepEqual(names, [
+      "Snell Quiet Floor",
+      "Curry Lounge",
+      "ISEC Atrium",
+    ]);
+  }
+});
+
+/** Test that spots with missing fields or invalid tags do not crash filtering. */
+test("filterSpots handles messy spots", () => {
+  // Create test cases with missing fields and invalid tags
+  const messySpots = [
+    { name: "No Building", tags: "not a list" },
+    { building: "No Name Hall", tags: [5, null, "quiet"] },
+  ];
+
+  // Check that search matches the building even when name is missing
+  assert.equal(filterSpots(messySpots, { search: "hall" }).length, 1);
+
+  // Check that the tag filter matches a valid tag among invalid tags
+  assert.equal(filterSpots(messySpots, { tag: "quiet" }).length, 1);
+});
+
+/** Test that filterSpots handles a large number of spots. */
+test("filterSpots handles 10000 spots", () => {
+  // Create 10000 spots with alternating Quiet and Loud noise levels
+  const manySpots = Array.from({ length: 10000 }, (_, i) => ({
+    name: `Spot ${i}`,
+    noiseLevel: i % 2 === 0 ? "Quiet" : "Loud",
+  }));
+
+  // Check that filtering for Quiet returns 5000 spots
+  assert.equal(filterSpots(manySpots, { noiseLevel: "Quiet" }).length, 5000);
+});
