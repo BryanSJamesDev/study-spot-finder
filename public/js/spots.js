@@ -5,12 +5,44 @@ import {
   filterSpots,
 } from "./spotUtils.js";
 
+import {
+  initMap,
+  showSpotsOnMap,
+  onMapClick,
+  showSelectedLocation,
+  clearSelectedLocation,
+} from "./map.js";
+
 /** Global variables */
 // The ID of the spot being edited, or null when adding a new spot
 let editingId = null;
 
 // Every spot from the database, before filtering
 let allSpots = [];
+
+// The location picked on the map for the form, or null if none
+let selectedLocation = null;
+
+/** Sets the picked location on the map and updates the UI */
+function setLocation(lat, lng) {
+  selectedLocation = {
+    lat: Number(lat.toFixed(6)),
+    lng: Number(lng.toFixed(6)),
+  };
+  showSelectedLocation(selectedLocation.lat, selectedLocation.lng);
+  document.querySelector("#spot-location-text").textContent =
+    "Location set. Click the map again to move it.";
+  document.querySelector("#location-clear").hidden = false;
+}
+
+/** Resets the picked location and UI back to default */
+function clearLocation() {
+  selectedLocation = null;
+  clearSelectedLocation();
+  document.querySelector("#spot-location-text").textContent =
+    "Click the map to set this spot's location.";
+  document.querySelector("#location-clear").hidden = true;
+}
 
 /* Helper function to load spots */
 async function loadSpots() {
@@ -42,7 +74,12 @@ function getFilters() {
 
 /** Filters and displays the matching spots */
 function applyFilters() {
-  renderSpots(filterSpots(allSpots, getFilters()));
+  // Find the spots that match the filters
+  const matches = filterSpots(allSpots, getFilters());
+
+  // Show them as cards and as pins on the map
+  renderSpots(matches);
+  showSpotsOnMap(matches);
 }
 
 /** Reloads spots and applies the current filters */
@@ -56,6 +93,14 @@ async function refreshSpots() {
 
 /* Starts the page */
 async function init() {
+  // Create the map, but keep the page working if Leaflet fails to load
+  try {
+    initMap();
+    onMapClick(setLocation);
+  } catch (error) {
+    console.error("Failed to load the map", error);
+  }
+
   // Load and display the spots
   try {
     await refreshSpots();
@@ -76,6 +121,11 @@ async function init() {
 
   // Adds event listener for the cancel button
   document.querySelector("#form-cancel").addEventListener("click", stopEditing);
+
+  // Adds event listener for clearing the picked map location
+  document
+    .querySelector("#location-clear")
+    .addEventListener("click", clearLocation);
 
   // Re-filter the spots whenever a filter changes
   const filterForm = document.querySelector("#filter-form");
@@ -205,6 +255,8 @@ async function handleSubmit(event) {
     wifi: data.get("wifi") === "on",
     closingTime: data.get("closingTime") || undefined,
     tags: parseTags(data.get("tags")),
+    lat: selectedLocation ? selectedLocation.lat : null,
+    lng: selectedLocation ? selectedLocation.lng : null,
   };
 
   // Update the spot being edited, or create a new one
@@ -281,6 +333,13 @@ function startEditing(spot) {
   form.elements.closingTime.value = spot.closingTime ?? "";
   form.elements.tags.value = (spot.tags ?? []).join(", ");
 
+  // Show the spot's location, if it has one
+  if (typeof spot.lat === "number" && typeof spot.lng === "number") {
+    setLocation(spot.lat, spot.lng);
+  } else {
+    clearLocation();
+  }
+
   // Remember which spot is being edited
   editingId = spot._id;
 
@@ -302,6 +361,9 @@ function stopEditing() {
 
   // Reset the form fields
   document.querySelector("#spot-form").reset();
+
+  // Reset map location selection
+  clearLocation();
 
   // Restore the original form title and submit button
   document.querySelector("#form-title").textContent = "Add a study spot";

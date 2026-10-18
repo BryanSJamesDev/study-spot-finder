@@ -311,7 +311,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 ### Phase 4: Map and Algorithms
 
-- [ ] **Eleah:** Leaflet map limited to campus bounds, with click-to-set location
+- [x] **Eleah:** Leaflet map limited to campus bounds, with click-to-set location
 - [ ] **Eleah:** KNN recommender in `ml/knn.js` with explanations, plus tests
 - [ ] **Bryan:** Weighted forecast in `ml/forecast.js`, plus tests
 
@@ -324,6 +324,8 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 - [ ] **Both:** Narrated demo video
 - [ ] **Both:** Freeze code 24 hours before class
 - [ ] **Both:** Submit the final form with thumbnail
+- [ ] **Eleah:** Space between the map and the spot cards
+- [ ] **Eleah:** Map next to the spot list, like the Figma (`spots-layout`)
 
 ---
 
