@@ -4,6 +4,7 @@ import express from "express";
 import { ObjectId } from "mongodb";
 import checkinsRouter from "../routes/checkins.js";
 import { connectDB, getDB, closeDB } from "../db.js";
+import { getCampusDayAndHour } from "../ml/crowd.js";
 
 const server = express();
 let baseUrl;
@@ -210,6 +211,28 @@ test("GET with limit returns only the newest check-ins", async () => {
   }
 });
 
+/** Test invalid limits return a 400 status code. */
+test("invalid limits return 400", async () => {
+  for (const limit of ["0", "-1", "abc", "3.5", "101", "999999", ""]) {
+    const res = await fetch(`${baseUrl}?limit=${limit}`);
+
+    assert.equal(res.status, 400);
+
+    const body = await res.json();
+    assert.match(body.error, /Limit must be a whole number from 1 to 100/);
+  }
+});
+
+/** Test the highest allowed limit is accepted. */
+test("limit of 100 is accepted", async () => {
+  const res = await fetch(`${baseUrl}?limit=100`);
+
+  assert.equal(res.status, 200);
+
+  const body = await res.json();
+  assert.ok(body.length <= 100);
+});
+
 /** Test crowded-now averages the last 2 hours and ignores older check-ins. */
 test("GET /api/checkins/crowded-now averages recent check-ins", async () => {
   const { insertedIds } = await getDB()
@@ -277,8 +300,6 @@ test("valid check-in returns 201", async () => {
     assert.ok(body._id);
     assert.equal(body.spotName, "Test Spot for POST");
     assert.equal(body.crowdLevel, "Moderate");
-    assert.equal(body.day, "Tuesday");
-    assert.equal(body.hour, 15);
     assert.equal(body.note, null);
     assert.ok(body.createdAt);
   } finally {
@@ -304,25 +325,20 @@ test("note is trimmed and saved", async () => {
   }
 });
 
-/** Test the earliest and latest hours are accepted. */
-test("hour 0 and hour 23 are both accepted", async () => {
-  const created = [];
+/** Test day and hour come from the server, not the request body. */
+test("day and hour are set by the server", async () => {
+  const res = await postCheckin(validCheckin({ day: "Monday", hour: 3 }));
+  const body = await res.json();
 
   try {
-    for (const hour of [0, 23]) {
-      const res = await postCheckin(
-        validCheckin({ spotName: "Test Spot for Hour Limits", hour }),
-      );
-      const body = await res.json();
-      created.push(body._id);
+    assert.equal(res.status, 201);
 
-      assert.equal(res.status, 201);
-      assert.equal(body.hour, hour);
-    }
+    // The day and hour the server works out from createdAt
+    const expected = getCampusDayAndHour(new Date(body.createdAt));
+    assert.equal(body.day, expected.day);
+    assert.equal(body.hour, expected.hour);
   } finally {
-    for (const id of created) {
-      await removeCheckin(id);
-    }
+    await removeCheckin(body._id);
   }
 });
 
@@ -370,30 +386,6 @@ test("invalid crowd levels return 400", async () => {
   }
 });
 
-/** Test invalid days return a 400 status code. */
-test("invalid days return 400", async () => {
-  for (const day of ["Funday", "monday", 3, null]) {
-    const res = await postCheckin(validCheckin({ day }));
-
-    assert.equal(res.status, 400);
-
-    const body = await res.json();
-    assert.match(body.error, /Day must be a day of the week/);
-  }
-});
-
-/** Test invalid hours return a 400 status code. */
-test("invalid hours return 400", async () => {
-  for (const hour of [-1, 24, 3.5, "15", null]) {
-    const res = await postCheckin(validCheckin({ hour }));
-
-    assert.equal(res.status, 400);
-
-    const body = await res.json();
-    assert.match(body.error, /Hour must be a whole number from 0 to 23/);
-  }
-});
-
 /** Test invalid notes return a 400 status code. */
 test("invalid notes return 400", async () => {
   for (const note of [5, null, "a".repeat(201)]) {
@@ -415,8 +407,6 @@ test("empty body returns all validation errors", async () => {
   const body = await res.json();
   assert.match(body.error, /Spot name is required/);
   assert.match(body.error, /Crowd level/);
-  assert.match(body.error, /Day must be a day of the week/);
-  assert.match(body.error, /Hour must be a whole number from 0 to 23/);
 });
 
 /** Test that updating a check-in saves the changes and keeps createdAt. */
@@ -434,7 +424,6 @@ test("updating a check-in saves the changes", async () => {
       validCheckin({
         spotName: "Test Spot for Update",
         crowdLevel: "Very busy",
-        hour: 16,
         note: "no seats left",
       }),
     );
@@ -443,7 +432,8 @@ test("updating a check-in saves the changes", async () => {
 
     const body = await updateRes.json();
     assert.equal(body.crowdLevel, "Very busy");
-    assert.equal(body.hour, 16);
+    assert.equal(body.day, created.day);
+    assert.equal(body.hour, created.hour);
 
     // Check that the changes were saved in the database.
     const getRes = await fetch(`${baseUrl}/${created._id}`);
@@ -487,8 +477,6 @@ test("PUT with invalid data returns 400", async () => {
   const body = await res.json();
   assert.match(body.error, /Spot name is required/);
   assert.match(body.error, /Crowd level/);
-  assert.match(body.error, /Day must be a day of the week/);
-  assert.match(body.error, /Hour must be a whole number from 0 to 23/);
 });
 
 /** Test that deleting a check-in returns 204 and removes it from the database. */

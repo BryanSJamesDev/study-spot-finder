@@ -1,25 +1,22 @@
 import express from "express";
 import { ObjectId } from "mongodb";
 import { getDB } from "../db.js";
-import { CROWD_LEVELS, crowdToScore, scoreToCrowd } from "../ml/crowd.js";
+import {
+  CROWD_LEVELS,
+  crowdToScore,
+  scoreToCrowd,
+  getCampusDayAndHour,
+} from "../ml/crowd.js";
 
 // Create a router to handle requests related to check-ins
 const checkinsRouter = express.Router();
 
 /** GLOBAL VARIABLES */
-// Days of the week a check-in can be for
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
 // Longest note allowed
 const MAX_NOTE_LENGTH = 200;
+
+// Most check-ins one request can ask for
+const MAX_LIMIT = 100;
 
 // "Crowded now" looks at check-ins from the last 2 hours
 const CROWDED_NOW_WINDOW_MS = 2 * 60 * 60 * 1000;
@@ -41,21 +38,6 @@ function validateCheckin(checkin) {
     );
   }
 
-  // Check that day is a day of the week
-  if (!DAYS.includes(checkin.day)) {
-    errors.push("Day must be a day of the week, like Monday");
-  }
-
-  // Check that hour is a whole number from 0 to 23
-  if (
-    typeof checkin.hour !== "number" ||
-    !Number.isInteger(checkin.hour) ||
-    checkin.hour < 0 ||
-    checkin.hour > 23
-  ) {
-    errors.push("Hour must be a whole number from 0 to 23");
-  }
-
   // Check that note is short text if provided
   if (
     checkin.note !== undefined &&
@@ -69,6 +51,7 @@ function validateCheckin(checkin) {
 }
 
 // Helper function to build a check-in to be used by POST and PUT
+// Day and hour are not built here, the server sets them when a check-in is created
 function buildCheckin(checkin) {
   // Empty notes are saved as null
   const note = (checkin.note ?? "").trim();
@@ -77,8 +60,6 @@ function buildCheckin(checkin) {
   const newCheckin = {
     spotName: checkin.spotName.trim(),
     crowdLevel: checkin.crowdLevel,
-    day: checkin.day,
-    hour: checkin.hour,
     note: note === "" ? null : note,
   };
   return newCheckin;
@@ -88,6 +69,23 @@ function buildCheckin(checkin) {
 // Handle GET requests to /api/checkins which returns check-ins, newest first
 // Optional filters: /api/checkins?spotName=Snell Library&limit=20
 checkinsRouter.get("/", async (req, res) => {
+  // Check that the limit is a whole number from 1 to 100 if provided
+  const rawLimit = req.query.limit;
+  let limit = null;
+
+  if (rawLimit !== undefined) {
+    limit =
+      typeof rawLimit === "string" && /^\d+$/.test(rawLimit)
+        ? Number(rawLimit)
+        : NaN;
+
+    if (!(limit >= 1 && limit <= MAX_LIMIT)) {
+      return res
+        .status(400)
+        .json({ error: "Limit must be a whole number from 1 to 100" });
+    }
+  }
+
   try {
     // Only filter by spot name if one was provided
     const filter = req.query.spotName ? { spotName: req.query.spotName } : {};
@@ -98,9 +96,8 @@ checkinsRouter.get("/", async (req, res) => {
       .find(filter)
       .sort({ createdAt: -1 });
 
-    // Only limit the results if a valid limit was provided
-    const limit = Number(req.query.limit);
-    if (Number.isInteger(limit) && limit > 0) {
+    // Only limit the results if a limit was provided
+    if (limit !== null) {
       cursor = cursor.limit(limit);
     }
 
@@ -116,7 +113,8 @@ checkinsRouter.get("/", async (req, res) => {
 });
 
 // Handle GET requests to /api/checkins/crowded-now which returns how busy each spot is right now
-// This has to stay above /:id or "crowded-now" would be treated as an ID
+// This route has to stay above /:id. Express checks routes in order, so if /:id
+// came first, "crowded-now" would be treated as a check-in ID and return a 400.
 checkinsRouter.get("/crowded-now", async (req, res) => {
   try {
     // Only look at check-ins from the last 2 hours
@@ -212,8 +210,12 @@ checkinsRouter.post("/", async (req, res) => {
   }
 
   try {
-    // Build new check-in using helper function and stamp the creation time
-    const newCheckin = { ...buildCheckin(checkin), createdAt: new Date() };
+    // The server sets the time, so nobody can check in for a time that is not now
+    const createdAt = new Date();
+    const { day, hour } = getCampusDayAndHour(createdAt);
+
+    // Build new check-in using helper function and add the time fields
+    const newCheckin = { ...buildCheckin(checkin), day, hour, createdAt };
 
     // Insert the new check-in
     const result = await getDB().collection("checkins").insertOne(newCheckin);
@@ -230,6 +232,7 @@ checkinsRouter.post("/", async (req, res) => {
 });
 
 // Handle PUT requests to /api/checkins/:id which updates one check-in based off an ID
+// Day, hour, and createdAt are left alone, only the spot, crowd level, and note change
 checkinsRouter.put("/:id", async (req, res) => {
   // Check if ID is not valid
   if (!ObjectId.isValid(req.params.id)) {
@@ -253,21 +256,23 @@ checkinsRouter.put("/:id", async (req, res) => {
     // Convert the ID
     const id = new ObjectId(req.params.id);
 
-    // Build updated check-in (createdAt is left alone)
+    // Build updated check-in
     const updatedCheckin = buildCheckin(checkin);
 
     // Update the check-in with the new updated check-in
-    const result = await getDB()
-      .collection("checkins")
-      .updateOne({ _id: id }, { $set: updatedCheckin });
+    const collection = getDB().collection("checkins");
+    const result = await collection.updateOne(
+      { _id: id },
+      { $set: updatedCheckin },
+    );
 
     // If check-in doesn't exist return with check-in not found
     if (result.matchedCount === 0) {
       return res.status(404).json({ error: "Check-in not found" });
     }
 
-    // Send back check-in
-    return res.json({ _id: id, ...updatedCheckin });
+    // Send back the saved check-in
+    return res.json(await collection.findOne({ _id: id }));
   } catch (error) {
     // Log the error if updating the check-in fails
     console.error("Failed to update check-in", error);
