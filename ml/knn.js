@@ -1,3 +1,6 @@
+// Mapping noise levels to numbers so they can be compared
+const NOISE_VALUES = { Quiet: 0, Moderate: 0.5, Loud: 1 };
+
 /** Helper function that cleans a list of tags into a Set of unique lowercase tags */
 function cleanTags(tags) {
   // If tags is not a list return an empty Set
@@ -38,4 +41,37 @@ export function tagSimilarity(tagsA, tagsB) {
 
   // Return shared tags divided by total unique tags
   return shared / total;
+}
+
+/** Measures how different two spots are from 0 (identical) to larger numbers (more different) */
+export function spotDistance(a, b) {
+  // A missing spot can't be compared, so treat it as infinitely far away
+  if (!a || !b) {
+    return Infinity;
+  }
+
+  // Get numeric noise levels, falling back to 0.5 if missing or unknown
+  const noiseA = NOISE_VALUES[a.noiseLevel] ?? 0.5;
+  const noiseB = NOISE_VALUES[b.noiseLevel] ?? 0.5;
+  const noiseDiff = noiseA - noiseB;
+
+  // Convert boolean outlets into 1 or 0 and find the difference
+  const outletsA = a.outlets === true ? 1 : 0;
+  const outletsB = b.outlets === true ? 1 : 0;
+  const outletsDiff = outletsA - outletsB;
+
+  // Convert boolean Wi-Fi into 1 or 0 and find the difference
+  const wifiA = a.wifi === true ? 1 : 0;
+  const wifiB = b.wifi === true ? 1 : 0;
+  const wifiDiff = wifiA - wifiB;
+
+  // If neither spot has tags they match on tags, otherwise flip tag similarity
+  const bothNoTags =
+    cleanTags(a.tags).size === 0 && cleanTags(b.tags).size === 0;
+  const tagsDiff = bothNoTags ? 0 : 1 - tagSimilarity(a.tags, b.tags);
+
+  // Calculate Euclidean distance by squaring differences, summing them, and taking the square root
+  return Math.sqrt(
+    noiseDiff ** 2 + outletsDiff ** 2 + wifiDiff ** 2 + tagsDiff ** 2,
+  );
 }
