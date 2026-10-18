@@ -1,0 +1,153 @@
+// Mapping noise levels to numbers so they can be compared
+const NOISE_VALUES = { Quiet: 0, Moderate: 0.5, Loud: 1 };
+
+/** Helper function that cleans a list of tags into a Set of unique lowercase tags */
+function cleanTags(tags) {
+  // If tags is not a list return an empty Set
+  if (!Array.isArray(tags)) {
+    return new Set();
+  }
+
+  // Keep only non-empty strings, then trim and lowercase them
+  const cleaned = tags
+    .filter((tag) => typeof tag === "string" && tag.trim() !== "")
+    .map((tag) => tag.trim().toLowerCase());
+
+  // Turning it into a Set removes duplicates
+  return new Set(cleaned);
+}
+
+/** Returns how similar two tag lists are, from 0 (nothing shared) to 1 (identical) */
+export function tagSimilarity(tagsA, tagsB) {
+  // Clean both tag lists
+  const setA = cleanTags(tagsA);
+  const setB = cleanTags(tagsB);
+
+  // Count every unique tag across both lists
+  const total = new Set([...setA, ...setB]).size;
+
+  // If neither list has tags return 0 so we don't divide by zero
+  if (total === 0) {
+    return 0;
+  }
+
+  // Count how many tags both lists share
+  let shared = 0;
+  for (const tag of setA) {
+    if (setB.has(tag)) {
+      shared++;
+    }
+  }
+
+  // Return shared tags divided by total unique tags
+  return shared / total;
+}
+
+/** Measures how different two spots are from 0 (identical) to larger numbers (more different) */
+export function spotDistance(a, b) {
+  // A missing spot can't be compared, so treat it as infinitely far away
+  if (!a || !b) {
+    return Infinity;
+  }
+
+  // Get numeric noise levels, falling back to 0.5 if missing or unknown
+  const noiseA = NOISE_VALUES[a.noiseLevel] ?? 0.5;
+  const noiseB = NOISE_VALUES[b.noiseLevel] ?? 0.5;
+  const noiseDiff = noiseA - noiseB;
+
+  // Convert boolean outlets into 1 or 0 and find the difference
+  const outletsA = a.outlets === true ? 1 : 0;
+  const outletsB = b.outlets === true ? 1 : 0;
+  const outletsDiff = outletsA - outletsB;
+
+  // Convert boolean Wi-Fi into 1 or 0 and find the difference
+  const wifiA = a.wifi === true ? 1 : 0;
+  const wifiB = b.wifi === true ? 1 : 0;
+  const wifiDiff = wifiA - wifiB;
+
+  // If neither spot has tags they match on tags, otherwise flip tag similarity
+  const bothNoTags =
+    cleanTags(a.tags).size === 0 && cleanTags(b.tags).size === 0;
+  const tagsDiff = bothNoTags ? 0 : 1 - tagSimilarity(a.tags, b.tags);
+
+  // Calculate Euclidean distance by squaring differences, summing them, and taking the square root
+  return Math.sqrt(
+    noiseDiff ** 2 + outletsDiff ** 2 + wifiDiff ** 2 + tagsDiff ** 2,
+  );
+}
+
+/** Returns a list of user-facing reason strings explaining why two spots match */
+export function explainMatch(a, b) {
+  // If either spot is missing, return an empty reasons list
+  if (!a || !b) {
+    return [];
+  }
+
+  const reasons = [];
+
+  // Check if both spots have the exact same noise level defined
+  if (a.noiseLevel && b.noiseLevel && a.noiseLevel === b.noiseLevel) {
+    reasons.push("Same noise level");
+  }
+
+  // Check if both spots offer power outlets
+  if (a.outlets === true && b.outlets === true) {
+    reasons.push("Both have outlets");
+  }
+
+  // Check if both spots provide Wi-Fi access
+  if (a.wifi === true && b.wifi === true) {
+    reasons.push("Both have Wi-Fi");
+  }
+
+  // Clean both tag lists and count common tags
+  const setA = cleanTags(a.tags);
+  const setB = cleanTags(b.tags);
+
+  let shared = 0;
+  for (const tag of setA) {
+    if (setB.has(tag)) {
+      shared++;
+    }
+  }
+
+  // Add tag overlap reasons with proper pluralization
+  if (shared === 1) {
+    reasons.push("1 shared tag");
+  } else if (shared > 1) {
+    reasons.push(`${shared} shared tags`);
+  }
+
+  return reasons;
+}
+
+/** Finds the top k most similar spots to a target spot using K-Nearest Neighbors */
+export function findSimilarSpots(target, spots, k = 3) {
+  // Return an empty array if target is missing or spots isn't an array
+  if (!target || !Array.isArray(spots)) {
+    return [];
+  }
+
+  // Fall back to 3 if k is not a positive integer
+  const validK = Number.isInteger(k) && k >= 1 ? k : 3;
+
+  return (
+    spots
+      // Filter out null entries and the target spot itself by matching names
+      .filter((spot) => spot && spot.name !== target.name)
+      // Attach calculated distance and human-readable reasons to each candidate spot
+      .map((spot) => ({
+        spot,
+        distance: spotDistance(target, spot),
+        reasons: explainMatch(target, spot),
+      }))
+      // Sort by distance ascending; fall back to safe alphabetical order by name on ties
+      .sort(
+        (x, y) =>
+          x.distance - y.distance ||
+          (x.spot.name ?? "").localeCompare(y.spot.name ?? ""),
+      )
+      // Return only the top k closest spots
+      .slice(0, validK)
+  );
+}

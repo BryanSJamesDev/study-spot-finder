@@ -897,3 +897,81 @@ test("PUT updates the location", async () => {
     }
   }
 });
+
+/** Test that similar spots returns the closest match first. */
+test("similar spots returns the closest match first", async () => {
+  const targetRes = await postSpot({
+    name: "Test KNN Target",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["test knn unique tag"],
+  });
+  const target = await targetRes.json();
+
+  const twinRes = await postSpot({
+    name: "Test KNN Twin",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["test knn unique tag"],
+  });
+  const twin = await twinRes.json();
+
+  try {
+    assert.equal(targetRes.status, 201);
+    assert.equal(twinRes.status, 201);
+
+    const res = await fetch(`${baseUrl}/${target._id}/similar`);
+    assert.equal(res.status, 200);
+
+    const body = await res.json();
+    assert.ok(Array.isArray(body));
+    assert.ok(body.length <= 3);
+
+    // The identical twin should be the closest match
+    assert.equal(body[0].spot.name, "Test KNN Twin");
+    assert.equal(body[0].distance, 0);
+
+    // A spot should never recommend itself
+    assert.ok(body.every((match) => match.spot.name !== "Test KNN Target"));
+  } finally {
+    for (const spot of [target, twin]) {
+      if (spot._id) {
+        await getDB()
+          .collection("spots")
+          .deleteOne({ _id: new ObjectId(spot._id) });
+      }
+    }
+  }
+});
+
+/** Test that similar spots handles invalid and missing IDs. */
+test("similar spots handles bad IDs", async () => {
+  const invalidRes = await fetch(`${baseUrl}/hello/similar`);
+  assert.equal(invalidRes.status, 400);
+  const invalidBody = await invalidRes.json();
+  assert.equal(invalidBody.error, "Invalid spot ID");
+
+  const missingRes = await fetch(`${baseUrl}/000000000000000000000000/similar`);
+  assert.equal(missingRes.status, 404);
+  const missingBody = await missingRes.json();
+  assert.equal(missingBody.error, "Spot not found");
+});
+
+/** Test that similar spots returns a 500 status when the database fails. */
+test("similar spots returns 500 when the database fails", async () => {
+  await closeDB();
+
+  try {
+    const res = await fetch(`${baseUrl}/000000000000000000000000/similar`);
+    assert.equal(res.status, 500);
+
+    const body = await res.json();
+    assert.equal(body.error, "Failed to load similar spots");
+  } finally {
+    await connectDB();
+  }
+});
