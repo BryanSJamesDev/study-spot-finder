@@ -5,6 +5,8 @@ import {
   filterSpots,
 } from "./spotUtils.js";
 
+import { initMap, showSpotsOnMap } from "./map.js";
+
 /** Global variables */
 // The ID of the spot being edited, or null when adding a new spot
 let editingId = null;
@@ -42,7 +44,12 @@ function getFilters() {
 
 /** Filters and displays the matching spots */
 function applyFilters() {
-  renderSpots(filterSpots(allSpots, getFilters()));
+  // Find the spots that match the filters
+  const matches = filterSpots(allSpots, getFilters());
+
+  // Show them as cards and as pins on the map
+  renderSpots(matches);
+  showSpotsOnMap(matches);
 }
 
 /** Reloads spots and applies the current filters */
@@ -56,6 +63,13 @@ async function refreshSpots() {
 
 /* Starts the page */
 async function init() {
+  // Create the map, but keep the page working if Leaflet fails to load
+  try {
+    initMap();
+  } catch (error) {
+    console.error("Failed to load the map", error);
+  }
+
   // Load and display the spots
   try {
     await refreshSpots();
