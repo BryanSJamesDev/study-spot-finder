@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "node --test",
-    "seed:spots": "node seed/spots.js"
+    "seed:spots": "node seed/spots.js",
+    "seed:ratings": "node seed/ratings.js",
+    "seed:checkins": "node seed/checkins.js"
   },
   "keywords": [],
   "author": "Eleah Burman and Bryan James",
