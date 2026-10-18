@@ -75,3 +75,48 @@ export function spotDistance(a, b) {
     noiseDiff ** 2 + outletsDiff ** 2 + wifiDiff ** 2 + tagsDiff ** 2,
   );
 }
+
+/** Returns a list of user-facing reason strings explaining why two spots match */
+export function explainMatch(a, b) {
+  // If either spot is missing, return an empty reasons list
+  if (!a || !b) {
+    return [];
+  }
+
+  const reasons = [];
+
+  // Check if both spots have the exact same noise level defined
+  if (a.noiseLevel && b.noiseLevel && a.noiseLevel === b.noiseLevel) {
+    reasons.push("Same noise level");
+  }
+
+  // Check if both spots offer power outlets
+  if (a.outlets === true && b.outlets === true) {
+    reasons.push("Both have outlets");
+  }
+
+  // Check if both spots provide Wi-Fi access
+  if (a.wifi === true && b.wifi === true) {
+    reasons.push("Both have Wi-Fi");
+  }
+
+  // Clean both tag lists and count common tags
+  const setA = cleanTags(a.tags);
+  const setB = cleanTags(b.tags);
+
+  let shared = 0;
+  for (const tag of setA) {
+    if (setB.has(tag)) {
+      shared++;
+    }
+  }
+
+  // Add tag overlap reasons with proper pluralization
+  if (shared === 1) {
+    reasons.push("1 shared tag");
+  } else if (shared > 1) {
+    reasons.push(`${shared} shared tags`);
+  }
+
+  return reasons;
+}
