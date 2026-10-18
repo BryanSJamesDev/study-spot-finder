@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Spots · Study Spot Finder</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
     <link rel="stylesheet" href="./css/shared.css" />
     <link rel="stylesheet" href="./css/nav.css" />
     <link rel="stylesheet" href="./css/spots.css" />
@@ -78,6 +82,12 @@
       </section>
       <section>
         <h2>Study Spots</h2>
+        <div
+          id="map"
+          class="map"
+          role="region"
+          aria-label="Map of study spots"
+        ></div>
         <div id="spot-list" class="spot-grid"></div>
       </section>
 
@@ -184,6 +194,7 @@
         </form>
       </section>
     </main>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script type="module" src="./js/spots.js"></script>
   </body>
 </html>
