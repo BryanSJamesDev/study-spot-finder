@@ -799,3 +799,101 @@ test("half a location returns 400", async () => {
     assert.match(body.error, /Location needs both latitude and longitude/);
   }
 });
+
+/**
+ * Test that off-campus and wrong-type locations return a 400 status.
+ */
+test("invalid locations return 400", async () => {
+  for (const location of [
+    { lat: 40.7128, lng: -74.006 },
+    { lat: 42.3329, lng: -71.0878 },
+    { lat: 42.3381, lng: -71.0969 },
+    { lat: "42.3381", lng: "-71.0878" },
+    { lat: true, lng: false },
+  ]) {
+    const res = await postSpot({
+      name: "Test Spot",
+      building: "Snell Library",
+      noiseLevel: "Quiet",
+      ...location,
+    });
+
+    assert.equal(res.status, 400);
+
+    const body = await res.json();
+    assert.match(body.error, /Location must be on Northeastern's campus/);
+  }
+});
+
+/**
+ * Test that locations on the exact campus boundaries are accepted.
+ */
+test("exact campus boundaries are accepted", async () => {
+  const locations = [
+    { lat: 42.333, lng: -71.096 },
+    { lat: 42.344, lng: -71.083 },
+  ];
+  const createdIds = [];
+
+  try {
+    for (let i = 0; i < locations.length; i++) {
+      const res = await postSpot({
+        name: `Test Spot for Edge ${i}`,
+        building: "Snell Library",
+        noiseLevel: "Quiet",
+        ...locations[i],
+      });
+
+      const body = await res.json();
+
+      assert.equal(res.status, 201);
+      createdIds.push(body._id);
+    }
+  } finally {
+    for (const id of createdIds) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({ _id: new ObjectId(id) });
+    }
+  }
+});
+
+/**
+ * Test that PUT updates a spot's location.
+ */
+test("PUT updates the location", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Location Update",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+    lat: 42.3381,
+    lng: -71.0878,
+  });
+
+  const created = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+
+    const updateRes = await putSpot(created._id, {
+      name: "Test Spot for Location Update",
+      building: "Snell Library",
+      noiseLevel: "Quiet",
+      lat: 42.339,
+      lng: -71.089,
+    });
+
+    assert.equal(updateRes.status, 200);
+
+    const body = await updateRes.json();
+
+    assert.equal(body.lat, 42.339);
+    assert.equal(body.lng, -71.089);
+  } finally {
+    if (created._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({ _id: new ObjectId(created._id) });
+    }
+  }
+});
