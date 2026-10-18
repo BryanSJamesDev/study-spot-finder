@@ -155,7 +155,21 @@
               type="time"
             />
           </div>
-
+          <!-- Location (set by clicking the map) -->
+          <div class="field">
+            <p class="field__label">Location</p>
+            <p id="spot-location-text" class="field__hint" aria-live="polite">
+              Click the map to set this spot's location.
+            </p>
+            <button
+              type="button"
+              id="location-clear"
+              class="btn btn--secondary"
+              hidden
+            >
+              Clear location
+            </button>
+          </div>
           <!-- Tags -->
           <div class="field">
             <label for="spot-tags" class="field__label">Tags</label>
