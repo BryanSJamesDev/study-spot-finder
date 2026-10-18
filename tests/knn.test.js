@@ -1,6 +1,50 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { tagSimilarity, spotDistance, explainMatch } from "../ml/knn.js";
+import {
+  tagSimilarity,
+  spotDistance,
+  explainMatch,
+  findSimilarSpots,
+} from "../ml/knn.js";
+
+// Sample spots for findSimilarSpots tests
+const knnSpots = [
+  {
+    name: "Quiet A",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone"],
+  },
+  {
+    name: "Quiet B",
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone"],
+  },
+  {
+    name: "Quiet C",
+    noiseLevel: "Quiet",
+    outlets: false,
+    wifi: true,
+    tags: ["quiet zone"],
+  },
+  {
+    name: "Loud D",
+    noiseLevel: "Loud",
+    outlets: false,
+    wifi: false,
+    tags: ["group study"],
+  },
+  {
+    name: "Moderate E",
+    noiseLevel: "Moderate",
+    outlets: true,
+    wifi: true,
+    tags: ["natural light"],
+  },
+];
 
 /**
  * Test that tag similarity returns the expected scores.
@@ -242,4 +286,70 @@ test("missing input returns an empty list", () => {
   assert.deepEqual(explainMatch(null, spot), []);
   assert.deepEqual(explainMatch(spot, undefined), []);
   assert.deepEqual(explainMatch({}, {}), []);
+});
+
+/**
+ * Test that the closest spots are returned in order.
+ */
+test("finds the closest spots in order", () => {
+  const matches = findSimilarSpots(knnSpots[0], knnSpots, 3);
+
+  assert.deepEqual(
+    matches.map((match) => match.spot.name),
+    ["Quiet B", "Quiet C", "Moderate E"],
+  );
+});
+
+/**
+ * Test that the target spot is never included in the results.
+ */
+test("target never recommends itself", () => {
+  const matches = findSimilarSpots(knnSpots[0], knnSpots, 3);
+
+  assert.equal(
+    matches.some((match) => match.spot.name === "Quiet A"),
+    false,
+  );
+});
+
+/**
+ * Test that each match includes its distance and reasons.
+ */
+test("each match has a distance and reasons", () => {
+  const matches = findSimilarSpots(knnSpots[0], knnSpots, 3);
+
+  assert.equal(matches[0].spot.name, "Quiet B");
+  assert.equal(matches[0].distance, 0);
+  assert.deepEqual(matches[0].reasons, [
+    "Same noise level",
+    "Both have outlets",
+    "Both have Wi-Fi",
+    "1 shared tag",
+  ]);
+});
+
+/**
+ * Test that k controls the number of results and invalid k defaults to 3.
+ */
+test("k works and bad k falls back to 3", () => {
+  assert.equal(findSimilarSpots(knnSpots[0], knnSpots, 1).length, 1);
+  assert.equal(findSimilarSpots(knnSpots[0], knnSpots, 10).length, 4);
+
+  for (const k of [0, -1, 2.5, "2"]) {
+    assert.equal(findSimilarSpots(knnSpots[0], knnSpots, k).length, 3);
+  }
+});
+
+/**
+ * Test that invalid inputs are handled without crashing.
+ */
+test("bad input returns an empty list or skips invalid spots", () => {
+  assert.deepEqual(findSimilarSpots(null, knnSpots), []);
+  assert.deepEqual(findSimilarSpots(knnSpots[0], null), []);
+
+  const spotsWithInvalidEntries = [null, knnSpots[1], { noiseLevel: "Quiet" }];
+
+  const matches = findSimilarSpots(knnSpots[0], spotsWithInvalidEntries);
+
+  assert.equal(matches.length, 2);
 });
