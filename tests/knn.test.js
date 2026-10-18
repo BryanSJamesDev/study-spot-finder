@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { tagSimilarity } from "../ml/knn.js";
+import { tagSimilarity, spotDistance } from "../ml/knn.js";
 
 /**
  * Test that tag similarity returns the expected scores.
@@ -61,4 +61,104 @@ test("tag similarity works with large lists", () => {
   const tagsB = Array.from({ length: 1000 }, (_, i) => `tag ${i + 500}`);
 
   assert.equal(tagSimilarity(tagsA, tagsB), 500 / 1500);
+});
+
+/**
+ * Test that identical spots have a distance of 0.
+ */
+test("identical spots have distance 0", () => {
+  const spot = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone"],
+  };
+
+  assert.equal(spotDistance(spot, { ...spot }), 0);
+});
+
+/**
+ * Test that one different feature gives a distance of 1.
+ */
+test("one different feature gives distance 1", () => {
+  const spot = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone"],
+  };
+
+  const differentNoise = { ...spot, noiseLevel: "Loud" };
+  const differentOutlets = { ...spot, outlets: false };
+  const differentTags = { ...spot, tags: ["natural light"] };
+
+  assert.equal(spotDistance(spot, differentNoise), 1);
+  assert.equal(spotDistance(spot, differentOutlets), 1);
+  assert.equal(spotDistance(spot, differentTags), 1);
+});
+
+/**
+ * Test that spot distance is the same in either order.
+ */
+test("spot distance is symmetric", () => {
+  const a = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: false,
+    tags: ["quiet zone", "outlets"],
+  };
+
+  const b = {
+    noiseLevel: "Loud",
+    outlets: false,
+    wifi: true,
+    tags: ["natural light"],
+  };
+
+  const distanceAB = spotDistance(a, b);
+  const distanceBA = spotDistance(b, a);
+
+  assert.ok(Math.abs(distanceAB - distanceBA) < 0.0001);
+});
+
+/**
+ * Test that two spots without tags still have distance 0 if otherwise identical.
+ */
+test("identical spots with empty tags have distance 0", () => {
+  const a = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: [],
+  };
+
+  const b = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: [],
+  };
+
+  assert.equal(spotDistance(a, b), 0);
+});
+
+/**
+ * Test that missing and broken spot inputs are handled correctly.
+ */
+test("missing and broken inputs are handled correctly", () => {
+  const spot = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone"],
+  };
+
+  assert.equal(spotDistance(null, spot), Infinity);
+  assert.equal(spotDistance(spot, undefined), Infinity);
+  assert.equal(spotDistance({}, {}), 0);
+
+  assert.equal(
+    spotDistance({ noiseLevel: "Silent" }, { noiseLevel: "Moderate" }),
+    0,
+  );
 });
