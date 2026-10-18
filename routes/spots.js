@@ -8,6 +8,13 @@ const spotsRouter = express.Router();
 /** GLOBAL VARIABLES */
 // Global noise levels
 const NOISE_LEVELS = ["Quiet", "Moderate", "Loud"];
+// The area a spot's location must fall inside (Northeastern's campus)
+const CAMPUS_BOUNDS = {
+  minLat: 42.333,
+  maxLat: 42.344,
+  minLng: -71.096,
+  maxLng: -71.083,
+};
 
 /** HELPER FUNCTIONS */
 // Helper function that takes spot data and returns a list of error messages
@@ -59,6 +66,29 @@ function validateSpot(spot) {
     errors.push("Tags must be a list of words");
   }
 
+  // Check that latitude and longitude are provided together
+  const hasLat = spot.lat !== undefined && spot.lat !== null;
+  const hasLng = spot.lng !== undefined && spot.lng !== null;
+
+  // Check that both latitude and longitude are provided
+  if (hasLat !== hasLng) {
+    errors.push("Location needs both latitude and longitude");
+  }
+
+  // Check that the location is within Northeastern's campus
+  if (hasLat && hasLng) {
+    if (
+      typeof spot.lat !== "number" ||
+      typeof spot.lng !== "number" ||
+      spot.lat < CAMPUS_BOUNDS.minLat ||
+      spot.lat > CAMPUS_BOUNDS.maxLat ||
+      spot.lng < CAMPUS_BOUNDS.minLng ||
+      spot.lng > CAMPUS_BOUNDS.maxLng
+    ) {
+      errors.push("Location must be on Northeastern's campus");
+    }
+  }
+
   // Return errors
   return errors;
 }
@@ -74,6 +104,8 @@ function buildSpot(spot) {
     wifi: spot.wifi ?? false,
     closingTime: spot.closingTime ?? null,
     tags: (spot.tags ?? []).map((tag) => tag.trim()),
+    lat: spot.lat ?? null,
+    lng: spot.lng ?? null,
   };
   return newSpot;
 }
