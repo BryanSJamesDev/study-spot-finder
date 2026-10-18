@@ -724,3 +724,78 @@ test("DELETE returns 500 when the database fails", async () => {
     await connectDB();
   }
 });
+
+/**
+ * Test that a valid location is saved correctly.
+ */
+test("valid location is saved", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Location",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+    lat: 42.3381,
+    lng: -71.0878,
+  });
+
+  const body = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+    assert.equal(body.lat, 42.3381);
+    assert.equal(body.lng, -71.0878);
+  } finally {
+    if (body._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({ _id: new ObjectId(body._id) });
+    }
+  }
+});
+
+/**
+ * Test that a missing location saves as null.
+ */
+test("missing location saves as null", async () => {
+  const res = await postSpot({
+    name: "Test Spot for Missing Location",
+    building: "Snell Library",
+    noiseLevel: "Quiet",
+  });
+
+  const body = await res.json();
+
+  try {
+    assert.equal(res.status, 201);
+    assert.equal(body.lat, null);
+    assert.equal(body.lng, null);
+  } finally {
+    if (body._id) {
+      await getDB()
+        .collection("spots")
+        .deleteOne({ _id: new ObjectId(body._id) });
+    }
+  }
+});
+
+/**
+ * Test that providing only half a location returns a 400 status.
+ */
+test("half a location returns 400", async () => {
+  for (const location of [
+    { lat: 42.3381 },
+    { lng: -71.0878 },
+    { lat: 42.3381, lng: null },
+  ]) {
+    const res = await postSpot({
+      name: "Test Spot",
+      building: "Snell Library",
+      noiseLevel: "Quiet",
+      ...location,
+    });
+
+    assert.equal(res.status, 400);
+
+    const body = await res.json();
+    assert.match(body.error, /Location needs both latitude and longitude/);
+  }
+});
