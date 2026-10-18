@@ -12,6 +12,9 @@ const CAMPUS_CORNERS = [
 let map = null;
 let markers = null;
 
+// The pin showing the location picked for the form
+let selectedMarker = null;
+
 /** A function that creates the map once */
 export function initMap() {
   // Don't create the map more than once
@@ -59,4 +62,45 @@ export function showSpotsOnMap(spots) {
     // Add the pin and its popup to the map
     L.marker([spot.lat, spot.lng]).bindPopup(label).addTo(markers);
   }
+}
+
+/** A function that runs when someone clicks the map */
+export function onMapClick(callback) {
+  // Return if the map has not been initialized
+  if (map === null) {
+    return;
+  }
+
+  // Pass the clicked latitude and longitude to the callback
+  map.on("click", (event) => callback(event.latlng.lat, event.latlng.lng));
+}
+
+/** A function that shows the selected location for the form */
+export function showSelectedLocation(lat, lng) {
+  // Return if the map has not been initialized
+  if (map === null) {
+    return;
+  }
+
+  // Remove the previous selected location pin
+  if (selectedMarker !== null) {
+    selectedMarker.remove();
+  }
+
+  // Add a red circle to mark the selected location
+  selectedMarker = L.circleMarker([lat, lng], {
+    radius: 10,
+    color: "#b42332",
+  }).addTo(map);
+}
+
+/** A function that clears the selected location pin */
+export function clearSelectedLocation() {
+  // Remove the selected location pin if one exists
+  if (selectedMarker !== null) {
+    selectedMarker.remove();
+  }
+
+  // Reset the selected marker
+  selectedMarker = null;
 }
