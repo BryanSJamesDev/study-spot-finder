@@ -120,3 +120,34 @@ export function explainMatch(a, b) {
 
   return reasons;
 }
+
+/** Finds the top k most similar spots to a target spot using K-Nearest Neighbors */
+export function findSimilarSpots(target, spots, k = 3) {
+  // Return an empty array if target is missing or spots isn't an array
+  if (!target || !Array.isArray(spots)) {
+    return [];
+  }
+
+  // Fall back to 3 if k is not a positive integer
+  const validK = Number.isInteger(k) && k >= 1 ? k : 3;
+
+  return (
+    spots
+      // Filter out null entries and the target spot itself by matching names
+      .filter((spot) => spot && spot.name !== target.name)
+      // Attach calculated distance and human-readable reasons to each candidate spot
+      .map((spot) => ({
+        spot,
+        distance: spotDistance(target, spot),
+        reasons: explainMatch(target, spot),
+      }))
+      // Sort by distance ascending; fall back to safe alphabetical order by name on ties
+      .sort(
+        (x, y) =>
+          x.distance - y.distance ||
+          (x.spot.name ?? "").localeCompare(y.spot.name ?? ""),
+      )
+      // Return only the top k closest spots
+      .slice(0, validK)
+  );
+}
