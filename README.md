@@ -65,11 +65,14 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     ├── ml/
     │   ├── knn.js             # Eleah
     │   └── forecast.js        # Bryan
-    ├── seed/                  # Each person seeds their own collection
+    ├── seed/
+    │   ├── spots.js           # Eleah (runs the seed)
+    │   └── spotsData.js       # Eleah (the 20 seed spots)
     ├── tests/
     │   ├── db.test.js         # Eleah
     │   ├── spots.test.js      # Eleah
     │   ├── spotUtils.test.js  # Eleah
+    │   ├── spotsData.test.js  # Eleah
     │   ├── knn.test.js        # Eleah
     │   ├── ratings.test.js    # Bryan
     │   └── forecast.test.js   # Bryan
@@ -302,7 +305,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 ### Phase 3: Data and Deployment
 
-- [ ] **Eleah:** Seed script for spots in `seed/`
+- [x] **Eleah:** Seed script for spots in `seed/`
 - [ ] **Bryan:** Seed scripts for ratings and check-ins in `seed/` (enough for 1,000+ records total)
 - [ ] **Eleah:** Deploy and confirm the live site connects to MongoDB
 
@@ -359,6 +362,11 @@ To run tests:
 
     npm test
 
+To fill the database with sample data:
+
+    npm run seed:spots
+
+Seed scripts are safe to run more than once. They update existing records instead of creating duplicates.
 ---
 
 ## License
