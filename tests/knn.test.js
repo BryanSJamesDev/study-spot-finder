@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { tagSimilarity, spotDistance } from "../ml/knn.js";
+import { tagSimilarity, spotDistance, explainMatch } from "../ml/knn.js";
 
 /**
  * Test that tag similarity returns the expected scores.
@@ -161,4 +161,85 @@ test("missing and broken inputs are handled correctly", () => {
     spotDistance({ noiseLevel: "Silent" }, { noiseLevel: "Moderate" }),
     0,
   );
+});
+
+/**
+ * Test that matching features return reasons in the correct order.
+ */
+test("everything matches", () => {
+  const a = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone", "outlets"],
+  };
+
+  const b = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone", "outlets"],
+  };
+
+  assert.deepEqual(explainMatch(a, b), [
+    "Same noise level",
+    "Both have outlets",
+    "Both have Wi-Fi",
+    "2 shared tags",
+  ]);
+});
+
+/**
+ * Test that one shared tag uses the singular form and ignores capitalization.
+ */
+test("one shared tag uses the singular", () => {
+  const a = { tags: ["quiet zone", "cozy"] };
+  const b = { tags: ["Quiet Zone", "spacious"] };
+
+  assert.deepEqual(explainMatch(a, b), ["1 shared tag"]);
+});
+
+/**
+ * Test that spots with nothing in common return an empty list.
+ */
+test("nothing in common returns an empty list", () => {
+  const a = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    tags: ["quiet zone"],
+  };
+
+  const b = {
+    noiseLevel: "Loud",
+    wifi: true,
+    tags: ["group study"],
+  };
+
+  assert.deepEqual(explainMatch(a, b), []);
+});
+
+/**
+ * Test that features both spots lack do not count as matching reasons.
+ */
+test("features both spots lack do not count", () => {
+  const a = { outlets: false, wifi: false };
+  const b = { outlets: false, wifi: false };
+
+  assert.deepEqual(explainMatch(a, b), []);
+});
+
+/**
+ * Test that missing or incomplete inputs return an empty list.
+ */
+test("missing input returns an empty list", () => {
+  const spot = {
+    noiseLevel: "Quiet",
+    outlets: true,
+    wifi: true,
+    tags: ["quiet zone"],
+  };
+
+  assert.deepEqual(explainMatch(null, spot), []);
+  assert.deepEqual(explainMatch(spot, undefined), []);
+  assert.deepEqual(explainMatch({}, {}), []);
 });
