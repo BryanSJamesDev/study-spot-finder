@@ -1,6 +1,7 @@
 import express from "express";
 import { ObjectId } from "mongodb";
 import { getDB } from "../db.js";
+import { findSimilarSpots } from "../ml/knn.js";
 
 // Create a router to handle requests related to study spots
 const spotsRouter = express.Router();
@@ -152,6 +153,36 @@ spotsRouter.get("/:id", async (req, res) => {
 
     // Return a 500 status code to indicate a server error
     res.status(500).json({ error: "Failed to load spot" });
+  }
+});
+
+/**
+ * Get similar spots using KNN.
+ */
+spotsRouter.get("/:id/similar", async (req, res) => {
+  // Check whether the ID is valid
+  if (!ObjectId.isValid(req.params.id) || req.params.id.length !== 24) {
+    return res.status(400).json({ error: "Invalid spot ID" });
+  }
+
+  try {
+    // Get all spots so KNN can compare them
+    const spots = await getDB().collection("spots").find().toArray();
+
+    // Find the requested spot
+    const id = new ObjectId(req.params.id);
+    const target = spots.find((spot) => spot._id.equals(id));
+
+    // Return 404 if the spot doesn't exist
+    if (!target) {
+      return res.status(404).json({ error: "Spot not found" });
+    }
+
+    // Return the three most similar spots
+    res.json(findSimilarSpots(target, spots, 3));
+  } catch (error) {
+    console.error("Failed to load similar spots", error);
+    res.status(500).json({ error: "Failed to load similar spots" });
   }
 });
 
