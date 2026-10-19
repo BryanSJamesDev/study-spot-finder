@@ -12,6 +12,9 @@ import {
 // How many recent ratings to show at once
 const RECENT_LIMIT = 20;
 
+// How many top-rated spots to show in the averages section
+const TOP_LIMIT = 3;
+
 // The ID of the rating being edited, or null when adding a new rating
 let editingId = null;
 
@@ -151,7 +154,7 @@ function createRatingCard(rating) {
   return card;
 }
 
-/** Displays the average rating cards, best spots first */
+/** Displays the average rating cards for the top-rated spots */
 function renderAverages(averages) {
   const list = document.querySelector("#average-list");
 
@@ -161,9 +164,9 @@ function renderAverages(averages) {
     return;
   }
 
-  // Clear the list, then add a card for each spot
+  // Clear the list, then add a card for each of the top-rated spots
   list.replaceChildren();
-  for (const average of sortByAverage(averages)) {
+  for (const average of sortByAverage(averages).slice(0, TOP_LIMIT)) {
     list.append(createAverageCard(average));
   }
 }
