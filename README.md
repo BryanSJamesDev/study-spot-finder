@@ -12,11 +12,31 @@ Find study spots on Northeastern's campus that match how you study.
 
 ---
 
+## Screenshots
+
+### Home
+
+![Home page](docs/images/screenshot-home.png)
+
+### Spots
+
+![Spots page with the campus map](docs/images/screenshot-spots.png)
+
+### Ratings
+
+![Ratings page with Campus favorites](docs/images/screenshot-ratings.png)
+
+### Check-Ins
+
+![Check-ins page with the check-in form and crowded right now](docs/images/screenshot-checkins.png)
+
+### Crowd forecast
+
+![Crowd forecast cards for the next 6 hours](docs/images/screenshot-forecast.png)
+
 ## Project Objective
 
 A web app that helps students find study spots on campus that match their preferences. Users can add study spots with details like noise level, outlets, Wi-Fi, closing time, and tags, and view them on a map limited to Northeastern's campus. Students can rate spots from 1 to 5 stars and check in to report how crowded a spot is. The app also includes a k-nearest neighbors recommender that suggests similar spots, and a crowd forecast that predicts how busy a spot will be at a given day and time. Both algorithms are written from scratch in plain JavaScript.
-
-**Screenshot:** _coming soon_
 
 ---
 

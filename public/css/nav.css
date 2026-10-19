@@ -18,6 +18,9 @@
   font-family: var(--font-heading);
   font-weight: var(--weight-bold);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .nav__brand small {
