@@ -3,6 +3,7 @@ import {
   crowdBadgeClass,
   formatCheckinCount,
   formatCheckinTime,
+  formatHour,
   formatTimeAgo,
   sortCrowdedNow,
   validateCheckin,
@@ -21,6 +22,8 @@ const spotSelect = document.querySelector("#checkin-spot");
 const filterSelect = document.querySelector("#filter-spot");
 const crowdedList = document.querySelector("#crowded-list");
 const checkinList = document.querySelector("#checkin-list");
+const forecastSelect = document.querySelector("#forecast-spot");
+const forecastList = document.querySelector("#forecast-list");
 
 // The id of the check-in being edited, or null when adding a new one
 let editingId = null;
@@ -67,7 +70,7 @@ function fillSpotSelects(spots) {
     .map((spot) => spot.name)
     .sort((a, b) => a.localeCompare(b));
 
-  for (const select of [spotSelect, filterSelect]) {
+  for (const select of [spotSelect, filterSelect, forecastSelect]) {
     for (const name of names) {
       const option = document.createElement("option");
       option.value = name;
@@ -170,6 +173,33 @@ function createCheckinCard(checkin) {
 }
 
 /**
+ * Creates a card for one forecasted hour.
+ * @param {{day: string, hour: number, level: string|null, confidenceLabel: string}} forecast
+ * @returns {HTMLElement}
+ */
+function createForecastCard(forecast) {
+  const card = document.createElement("article");
+  card.className = "card";
+
+  const title = document.createElement("h3");
+  title.textContent = `${forecast.day} ${formatHour(forecast.hour)}`;
+
+  const meta = document.createElement("p");
+  meta.className = "text-muted";
+
+  // Hours with no matching check-ins have no forecast
+  if (forecast.level === null) {
+    meta.textContent = "Not enough check-ins to forecast";
+    card.append(title, meta);
+    return card;
+  }
+
+  meta.textContent = `${forecast.confidenceLabel} confidence`;
+  card.append(title, createBadge(forecast.level), meta);
+  return card;
+}
+
+/**
  * Shows the crowded-now cards, busiest spots first.
  * @param {object[]} rows
  */
@@ -221,10 +251,29 @@ async function loadCrowdedNow() {
 }
 
 /**
+ * Loads the forecast for the chosen spot.
+ */
+async function loadForecast() {
+  // Nothing to forecast until a spot is chosen
+  if (!forecastSelect.value) {
+    showMessage(forecastList, "Choose a spot to see its forecast.");
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({ spotName: forecastSelect.value });
+    const data = await fetchJson(`/api/checkins/forecast?${params}`);
+    forecastList.replaceChildren(...data.forecasts.map(createForecastCard));
+  } catch (error) {
+    showMessage(forecastList, error.message);
+  }
+}
+
+/**
  * Reloads everything on the page that depends on check-ins.
  */
 async function refreshCheckins() {
-  await Promise.all([loadCheckins(), loadCrowdedNow()]);
+  await Promise.all([loadCheckins(), loadCrowdedNow(), loadForecast()]);
 }
 
 /**
@@ -328,6 +377,7 @@ async function init() {
   form.addEventListener("submit", handleSubmit);
   cancelButton.addEventListener("click", stopEditing);
   filterSelect.addEventListener("change", loadCheckins);
+  forecastSelect.addEventListener("change", loadForecast);
 
   try {
     fillSpotSelects(await fetchJson("/api/spots"));
