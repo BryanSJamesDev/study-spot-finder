@@ -9,6 +9,8 @@ import {
   validateCheckin,
 } from "./checkinsUtils.js";
 
+import { confirmDelete } from "./confirmDialog.js";
+
 // How many recent check-ins to show
 const RECENT_LIMIT = 20;
 
@@ -353,7 +355,7 @@ async function handleSubmit(event) {
  * @param {object} checkin
  */
 async function deleteCheckin(checkin) {
-  if (!confirm(`Delete this check-in at ${checkin.spotName}?`)) {
+  if (!(await confirmDelete(`check-in at ${checkin.spotName}`))) {
     return;
   }
 
