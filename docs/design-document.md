@@ -191,7 +191,7 @@ flowchart LR
 ### Code organization
 
 - **Backend:** `server.js` (app setup), `db.js` (database module), `routes/` (one file per collection), `ml/` (KNN and forecast algorithms), `seed/` (scripts to generate test data).
-- **Frontend:** one HTML file per page in `public/`, one JavaScript module per page in `public/js/`, and CSS split by module in `public/css/` (`shared.css`, `nav.css`, and one file per page).
+- **Frontend:** one HTML file per page in `public/` (`index.html` for the home page, plus `spots.html`, `ratings.html`, and `checkins.html`), one JavaScript module per page in `public/js/` (`home.js`, `spots.js`, `ratings.js`, `checkins.js`, plus shared `confirmDialog.js`), CSS split by module in `public/css/` (`shared.css`, `nav.css`, `home.css`, and one file per page), and images in `public/images/` (`homepage.png` and the `logo.svg` map pin).
 - **Tests:** `tests/`, run with `npm test`. Route tests start a small Express app on a random free port and send real requests, and each test cleans up any data it creates.
 - **Ownership:** each teammate builds their features end to end in their own files. Ratings and check-ins reference spots by name rather than by ID, so neither teammate's code depends on the other's.
 
@@ -343,8 +343,8 @@ Each teammate builds their features end to end: the page, the browser JavaScript
 
 - Database connection module (`db.js`) and Express server (`server.js`), including mounting all three routers.
 - Figma mockups and style guide.
-- All CSS, split by module (`shared.css`, `nav.css`, and one file per page).
-- Home page and shared nav.
+- All CSS, split by module (`shared.css`, `nav.css`, `home.css`, and one file per page).
+- Home page (`index.html`, `home.js`, `home.css`, `homepage.png`), shared nav with the `logo.svg` map pin, and the shared delete dialog (`confirmDialog.js`).
 - ESLint, Prettier, and MIT license setup.
 - Database and spots route tests.
 - README and this design document.
