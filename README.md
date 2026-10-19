@@ -56,6 +56,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     ├── README.md              # Both (see rules below)
     ├── docs/
     │   ├── design-document.md # Both (project description, personas, stories, mockups)
+    │   ├── design-document.pdf # Both (PDF export of the design document)
     │   └── images/
     │       └── mockups.png
     ├── routes/
@@ -93,11 +94,16 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
         ├── css/
         │   ├── shared.css     # Eleah (variables, base, buttons, forms, cards)
         │   ├── nav.css        # Eleah (nav on every page)
+        │   ├── home.css       # Eleah (home page)
         │   ├── spots.css      # Eleah
         │   ├── ratings.css    # Eleah
         │   └── checkins.css   # Eleah
+        ├── images/
+        │   ├── homepage.png    # Eleah (home page photo)
+        │   └── logo.svg        # Eleah (nav logo)
         └── js/
             ├── spots.js       # Eleah
+            ├── home.js        # Eleah (home page featured spots)
             ├── spotUtils.js   # Eleah (formatting, tag, filter, and match reason helpers)
             ├── map.js         # Eleah
             ├── confirmDialog.js # Eleah (shared delete dialog, used by every page)
