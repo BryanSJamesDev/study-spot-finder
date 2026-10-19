@@ -65,6 +65,13 @@ main > section + section {
   margin-top: var(--space-8);
 }
 
+/* Keep the map in view while scrolling the spot list */
+.spots-layout .map {
+  position: sticky;
+  top: var(--space-4);
+  align-self: start;
+}
+
 @media (max-width: 48rem) {
   .spots-layout {
     grid-template-columns: 1fr;
