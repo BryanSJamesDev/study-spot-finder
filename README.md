@@ -7,7 +7,7 @@ Find study spots on Northeastern's campus that match how you study.
 **Stack:** Node.js, Express, Vanilla ES6, MongoDB (Node driver), Leaflet with OpenStreetMap
 **Design:** [Figma file](https://www.figma.com/design/gAZKaGijIlob4iAr49KcYV/Untitled)
 **Design document:** [docs/design-document.md](docs/design-document.md)
-**Deployed site:** _coming soon_
+**Deployed site:** https://study-spot-finder.onrender.com
 **Demo video:** _coming soon_
 
 ---
@@ -96,7 +96,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
         │   └── checkins.css   # Eleah
         └── js/
             ├── spots.js       # Eleah
-            ├── spotUtils.js   # Eleah (formatting, tag, and filter helpers)
+            ├── spotUtils.js   # Eleah (formatting, tag, filter, and match reason helpers)
             ├── map.js         # Eleah
             ├── ratings.js     # Bryan
             ├── ratingsUtils.js # Bryan (formatting and filter helpers)
@@ -233,17 +233,18 @@ Ratings and check-ins reference spots by **name**, so spot names must be unique.
 
 ## API Endpoints
 
-| Method           | Endpoint                    | Owner | Notes                                                       |
-| ---------------- | --------------------------- | ----- | ----------------------------------------------------------- |
-| GET, POST        | `/api/spots`                | Eleah |                                                             |
-| GET, PUT, DELETE | `/api/spots/:id`            | Eleah |                                                             |
-| GET, POST        | `/api/ratings`              | Bryan | GET accepts an optional `?spotName=`                        |
-| GET              | `/api/ratings/averages`     | Bryan | Average stars and count for each spot                       |
-| GET, PUT, DELETE | `/api/ratings/:id`          | Bryan |                                                             |
-| GET, POST        | `/api/checkins`             | Bryan | GET accepts optional `?spotName=` and `?limit=` (1 to 100)  |
-| GET              | `/api/checkins/crowded-now` | Bryan | Average crowd level for each spot from the last 2 hours     |
-| GET              | `/api/checkins/forecast`    | Bryan | Needs `?spotName=`, optional `?hours=` (1 to 24, default 6) |
-| GET, PUT, DELETE | `/api/checkins/:id`         | Bryan |                                                             |
+| Method           | Endpoint                    | Owner | Notes                                                            |
+| ---------------- | --------------------------- | ----- | ---------------------------------------------------------------- |
+| GET, POST        | `/api/spots`                | Eleah |                                                                  |
+| GET, PUT, DELETE | `/api/spots/:id`            | Eleah |                                                                  |
+| GET              | `/api/spots/:id/similar`    | Eleah | The 3 most similar spots (KNN), each with a distance and reasons |
+| GET, POST        | `/api/ratings`              | Bryan | GET accepts an optional `?spotName=`                             |
+| GET              | `/api/ratings/averages`     | Bryan | Average stars and count for each spot                            |
+| GET, PUT, DELETE | `/api/ratings/:id`          | Bryan |                                                                  |
+| GET, POST        | `/api/checkins`             | Bryan | GET accepts optional `?spotName=` and `?limit=` (1 to 100)       |
+| GET              | `/api/checkins/crowded-now` | Bryan | Average crowd level for each spot from the last 2 hours          |
+| GET              | `/api/checkins/forecast`    | Bryan | Needs `?spotName=`, optional `?hours=` (1 to 24, default 6)      |
+| GET, PUT, DELETE | `/api/checkins/:id`         | Bryan |                                                                  |
 
 Errors are returned as `{ "error": "message" }` with status `400` (bad input), `404` (not found), `409` (duplicate), or `500` (server error).
 
@@ -269,8 +270,8 @@ Errors are returned as `{ "error": "message" }` with status `400` (bad input), `
 - [x] Client-side rendering with vanilla JS (no template engines)
 - [x] At least 1 form
 - [x] At least 2 MongoDB collections with full CRUD (spots, ratings, and check-ins)
-- [ ] 1,000+ database records (via seed scripts)
-- [ ] Publicly deployed
+- [x] 1,000+ database records (via seed scripts)
+- [x] Publicly deployed
 - [ ] Narrated public demo video
 - [ ] Code review
 - [ ] README: authors, class link, objective, screenshot, build instructions
@@ -324,7 +325,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 ### Phase 4: Map and Algorithms
 
 - [x] **Eleah:** Leaflet map limited to campus bounds, with click-to-set location
-- [ ] **Eleah:** KNN recommender in `ml/knn.js` with explanations, plus tests
+- [x] **Eleah:** KNN recommender in `ml/knn.js` with explanations, plus tests
 - [ ] **Bryan:** Weighted forecast in `ml/forecast.js`, plus tests
 
 ### Phase 5: Submission
@@ -338,6 +339,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 - [ ] **Both:** Submit the final form with thumbnail
 - [ ] **Eleah:** Space between the map and the spot cards
 - [ ] **Eleah:** Map next to the spot list, like the Figma (`spots-layout`)
+- [ ] **Eleah:** Make the "No check-ins in the last 2 hours" message span the full width (`.checkin-grid > p`)
 
 ---
 
