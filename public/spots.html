@@ -49,35 +49,46 @@
               id="filter-search"
               name="search"
               class="input"
+              autocomplete="off"
             />
           </div>
 
-          <div class="field">
-            <label for="filter-noise" class="field__label">Noise level</label>
-            <select id="filter-noise" name="noiseLevel" class="select">
-              <option value="">Any noise level</option>
-              <option value="Quiet">Quiet</option>
-              <option value="Moderate">Moderate</option>
-              <option value="Loud">Loud</option>
-            </select>
-          </div>
+          <div class="filters__row">
+            <div class="field">
+              <label for="filter-noise" class="field__label">Noise level</label>
+              <select id="filter-noise" name="noiseLevel" class="select">
+                <option value="">Any noise level</option>
+                <option value="Quiet">Quiet</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Loud">Loud</option>
+              </select>
+            </div>
 
-          <div class="field field--checkbox">
-            <input type="checkbox" id="filter-outlets" name="outlets" />
-            <label for="filter-outlets">Has outlets</label>
-          </div>
+            <div class="field">
+              <label for="filter-tag" class="field__label">Tag</label>
+              <input
+                type="text"
+                id="filter-tag"
+                name="tag"
+                class="input"
+                autocomplete="off"
+              />
+            </div>
 
-          <div class="field field--checkbox">
-            <input type="checkbox" id="filter-wifi" name="wifi" />
-            <label for="filter-wifi">Has Wi-Fi</label>
-          </div>
+            <div class="field field--checkbox">
+              <input type="checkbox" id="filter-outlets" name="outlets" />
+              <label for="filter-outlets">Has outlets</label>
+            </div>
 
-          <div class="field">
-            <label for="filter-tag" class="field__label">Tag</label>
-            <input type="text" id="filter-tag" name="tag" class="input" />
-          </div>
+            <div class="field field--checkbox">
+              <input type="checkbox" id="filter-wifi" name="wifi" />
+              <label for="filter-wifi">Has Wi-Fi</label>
+            </div>
 
-          <button type="reset" class="btn btn--secondary">Clear filters</button>
+            <button type="reset" class="btn btn--secondary">
+              Clear filters
+            </button>
+          </div>
         </form>
       </section>
       <section>
