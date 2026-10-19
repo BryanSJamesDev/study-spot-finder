@@ -8,3 +8,16 @@
   background: var(--color-warning-soft);
   color: var(--color-warning);
 }
+
+.status--danger {
+  background: var(--color-primary-soft);
+  color: var(--color-error);
+}
+
+/* Grid of check-in cards */
+.checkin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
