@@ -371,3 +371,63 @@ Each teammate builds their features end to end: the page, the browser JavaScript
 - Deployment.
 - Code review.
 - Demo video and presentation.
+
+## 10. API, Setup, and Running Locally
+
+The details below match the README.
+
+**Deployed site:** https://study-spot-finder.onrender.com
+
+### API endpoints
+
+| Method           | Endpoint                    | Owner | Notes                                                            |
+| ---------------- | --------------------------- | ----- | ---------------------------------------------------------------- |
+| GET, POST        | `/api/spots`                | Eleah |                                                                  |
+| GET, PUT, DELETE | `/api/spots/:id`            | Eleah |                                                                  |
+| GET              | `/api/spots/:id/similar`    | Eleah | The 3 most similar spots (KNN), each with a distance and reasons |
+| GET, POST        | `/api/ratings`              | Bryan | GET accepts an optional `?spotName=`                             |
+| GET              | `/api/ratings/averages`     | Bryan | Average stars and count for each spot                            |
+| GET, PUT, DELETE | `/api/ratings/:id`          | Bryan |                                                                  |
+| GET, POST        | `/api/checkins`             | Bryan | GET accepts optional `?spotName=` and `?limit=` (1 to 100)       |
+| GET              | `/api/checkins/crowded-now` | Bryan | Average crowd level for each spot from the last 2 hours          |
+| GET              | `/api/checkins/forecast`    | Bryan | Needs `?spotName=`, optional `?hours=` (1 to 24, default 6)      |
+| GET, PUT, DELETE | `/api/checkins/:id`         | Bryan |                                                                  |
+
+Errors are returned as `{ "error": "message" }` with status `400` (bad input), `404` (not found), `409` (duplicate), or `500` (server error).
+
+### Scripts
+
+| Command                | What it does                                |
+| ---------------------- | ------------------------------------------- |
+| `npm run dev`          | Starts the server and restarts on save      |
+| `npm start`            | Starts the server (used for deployment)     |
+| `npm run lint`         | Checks for code errors with ESLint          |
+| `npm run format`       | Formats all files with Prettier             |
+| `npm run format:check` | Checks formatting without changing files    |
+| `npm test`             | Runs tests with Node's built-in test runner |
+
+### Environment variables
+
+Each person makes their own `.env` file in the project root. It's gitignored and never pushed.
+
+    MONGO_URI=your-connection-string-here
+    PORT=3000
+
+The database name is `studySpotFinder`. The map uses Leaflet with OpenStreetMap, which needs no API key.
+
+### Running locally
+
+    npm install
+    npm run dev
+
+Then open http://localhost:3000. To fill the database with sample data:
+
+    npm run seed:spots
+    npm run seed:ratings
+    npm run seed:checkins
+
+Seed scripts are safe to run more than once. "Crowded now" only counts check-ins from the last 2 hours, so run `npm run seed:checkins` again right before a demo.
+
+### License
+
+[MIT](LICENSE)
