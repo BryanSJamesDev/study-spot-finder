@@ -64,10 +64,13 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     │   └── checkins.js        # Bryan
     ├── ml/
     │   ├── knn.js             # Eleah
+    │   ├── crowd.js           # Bryan (crowd scores and campus day and hour)
     │   └── forecast.js        # Bryan
     ├── seed/
     │   ├── spots.js           # Eleah (runs the seed)
-    │   └── spotsData.js       # Eleah (the 20 seed spots)
+    │   ├── spotsData.js       # Eleah (the 20 seed spots)
+    │   ├── ratings.js         # Bryan (400 sample ratings)
+    │   └── checkins.js        # Bryan (600 sample check-ins)
     ├── tests/
     │   ├── db.test.js         # Eleah
     │   ├── spots.test.js      # Eleah
@@ -75,6 +78,10 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     │   ├── spotsData.test.js  # Eleah
     │   ├── knn.test.js        # Eleah
     │   ├── ratings.test.js    # Bryan
+    │   ├── ratingsUtils.test.js # Bryan
+    │   ├── checkins.test.js   # Bryan
+    │   ├── checkinsUtils.test.js # Bryan
+    │   ├── crowd.test.js      # Bryan
     │   └── forecast.test.js   # Bryan
     └── public/
         ├── index.html         # Eleah (shared, nav links to all pages)
@@ -92,7 +99,9 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
             ├── spotUtils.js   # Eleah (formatting, tag, and filter helpers)
             ├── map.js         # Eleah
             ├── ratings.js     # Bryan
-            └── checkins.js    # Bryan
+            ├── ratingsUtils.js # Bryan (formatting and filter helpers)
+            ├── checkins.js    # Bryan
+            └── checkinsUtils.js # Bryan (formatting and validation helpers)
 
 ---
 
@@ -218,20 +227,23 @@ Ratings and check-ins reference spots by **name**, so spot names must be unique.
 - Ratings are stars only, with no written review field.
 - If a spot is renamed or deleted, its ratings and check-ins are left as they are.
 - Anyone can edit or delete a rating or check-in (no user accounts).
+- Check-in `day` and `hour` are set by the server in campus time (America/New_York), so nobody can check in for another time.
 
 ---
 
 ## API Endpoints
 
-| Method           | Endpoint                | Owner | Notes                                 |
-| ---------------- | ----------------------- | ----- | ------------------------------------- |
-| GET, POST        | `/api/spots`            | Eleah |                                       |
-| GET, PUT, DELETE | `/api/spots/:id`        | Eleah |                                       |
-| GET, POST        | `/api/ratings`          | Bryan | GET accepts an optional `?spotName=`  |
-| GET              | `/api/ratings/averages` | Bryan | Average stars and count for each spot |
-| GET, PUT, DELETE | `/api/ratings/:id`      | Bryan |                                       |
-| GET, POST        | `/api/checkins`         | Bryan |                                       |
-| GET, PUT, DELETE | `/api/checkins/:id`     | Bryan |                                       |
+| Method           | Endpoint                    | Owner | Notes                                                       |
+| ---------------- | --------------------------- | ----- | ----------------------------------------------------------- |
+| GET, POST        | `/api/spots`                | Eleah |                                                             |
+| GET, PUT, DELETE | `/api/spots/:id`            | Eleah |                                                             |
+| GET, POST        | `/api/ratings`              | Bryan | GET accepts an optional `?spotName=`                        |
+| GET              | `/api/ratings/averages`     | Bryan | Average stars and count for each spot                       |
+| GET, PUT, DELETE | `/api/ratings/:id`          | Bryan |                                                             |
+| GET, POST        | `/api/checkins`             | Bryan | GET accepts optional `?spotName=` and `?limit=` (1 to 100)  |
+| GET              | `/api/checkins/crowded-now` | Bryan | Average crowd level for each spot from the last 2 hours     |
+| GET              | `/api/checkins/forecast`    | Bryan | Needs `?spotName=`, optional `?hours=` (1 to 24, default 6) |
+| GET, PUT, DELETE | `/api/checkins/:id`         | Bryan |                                                             |
 
 Errors are returned as `{ "error": "message" }` with status `400` (bad input), `404` (not found), `409` (duplicate), or `500` (server error).
 
@@ -241,7 +253,7 @@ Errors are returned as `{ "error": "message" }` with status `400` (bad input), `
 
 - **KNN recommender (Eleah):** Finds the spots most similar to a chosen spot based on noise, outlets, Wi-Fi, and tags, and explains why each one matched. Plain JavaScript, no libraries.
 - **Crowded now (Bryan):** Average crowd level from check-ins in the last 2 hours.
-- **Crowd forecast (Bryan):** For a chosen spot and day, predicts crowd level at each hour using a weighted average of past check-ins. Check-ins closer to that day and hour count more. Plain JavaScript, no libraries.
+- **Crowd forecast (Bryan):** For a chosen spot, predicts the crowd level for each of the next few hours using a weighted average of past check-ins. Check-ins from the same day and nearby hours count more, and recent check-ins count more than old ones. It also gives a confidence that grows with the amount of matching data. Plain JavaScript, no libraries.
 
 ---
 
@@ -256,7 +268,7 @@ Errors are returned as `{ "error": "message" }` with status `400` (bad input), `
 - [x] CSS organized by module
 - [x] Client-side rendering with vanilla JS (no template engines)
 - [x] At least 1 form
-- [x] At least 2 MongoDB collections with full CRUD (spots and ratings, check-ins in progress)
+- [x] At least 2 MongoDB collections with full CRUD (spots, ratings, and check-ins)
 - [ ] 1,000+ database records (via seed scripts)
 - [ ] Publicly deployed
 - [ ] Narrated public demo video
@@ -367,8 +379,11 @@ To run tests:
 To fill the database with sample data:
 
     npm run seed:spots
+    npm run seed:ratings
+    npm run seed:checkins
 
-Seed scripts are safe to run more than once. They update existing records instead of creating duplicates.
+Seed scripts are safe to run more than once. The spots script updates existing records, and the ratings and check-ins scripts replace their own sample records (marked `seeded`). "Crowded now" only counts check-ins from the last 2 hours, so run `npm run seed:checkins` again right before a demo.
+
 ---
 
 ## License
