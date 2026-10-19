@@ -7,9 +7,10 @@
 .nav__inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: var(--space-3) var(--space-6);
+  column-gap: var(--space-3);
   padding-block: var(--space-3);
 }
 
@@ -32,6 +33,7 @@
   gap: var(--space-1);
   list-style: none;
   margin: 0;
+  margin-left: auto;
   padding: 0;
 }
 
