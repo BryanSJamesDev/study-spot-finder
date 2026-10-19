@@ -21,3 +21,8 @@
   gap: var(--space-4);
   margin-top: var(--space-4);
 }
+
+/* Let messages inside the grid stretch across every column */
+.checkin-grid > p {
+  grid-column: 1 / -1;
+}

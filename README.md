@@ -77,6 +77,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     │   ├── spotUtils.test.js  # Eleah
     │   ├── spotsData.test.js  # Eleah
     │   ├── knn.test.js        # Eleah
+    │   ├── confirmDialog.test.js # Eleah
     │   ├── ratings.test.js    # Bryan
     │   ├── ratingsUtils.test.js # Bryan
     │   ├── checkins.test.js   # Bryan
@@ -85,6 +86,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
     │   └── forecast.test.js   # Bryan
     └── public/
         ├── index.html         # Eleah (shared, nav links to all pages)
+        ├── favicon.ico        # Eleah (map pin icon, shared by every page)
         ├── spots.html         # Eleah
         ├── ratings.html       # Bryan
         ├── checkins.html      # Bryan
@@ -98,6 +100,7 @@ Shared files (`server.js`, `db.js`, `package.json`, `public/index.html`, `public
             ├── spots.js       # Eleah
             ├── spotUtils.js   # Eleah (formatting, tag, filter, and match reason helpers)
             ├── map.js         # Eleah
+            ├── confirmDialog.js # Eleah (shared delete dialog, used by every page)
             ├── ratings.js     # Bryan
             ├── ratingsUtils.js # Bryan (formatting and filter helpers)
             ├── checkins.js    # Bryan
@@ -330,16 +333,16 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 ### Phase 5: Submission
 
-- [ ] **Eleah:** Final styling pass
-- [ ] **Eleah:** Replace `confirm()` with a styled `<dialog>` for deleting spots
-- [ ] **Eleah:** Compact filter layout to match the Figma (search on top, other filters in one row)
+- [x] **Eleah:** Final styling pass: map next to the spot list, compact filters, and spacing
+- [x] **Eleah:** Replace `confirm()` with a shared, styled delete dialog (`js/confirmDialog.js`)
+- [x] **Eleah:** Make the "No check-ins in the last 2 hours" message span the full width (`.checkin-grid > p`)
+- [x] **Eleah:** Add a hover style to the star rating
+- [x] **Eleah:** Add a favicon
+- [ ] **Bryan:** Switch Ratings and Check-Ins to the shared delete dialog
 - [ ] **Both:** Screenshot, deployed URL, and video link in README
 - [ ] **Both:** Narrated demo video
 - [ ] **Both:** Freeze code 24 hours before class
 - [ ] **Both:** Submit the final form with thumbnail
-- [ ] **Eleah:** Space between the map and the spot cards
-- [ ] **Eleah:** Map next to the spot list, like the Figma (`spots-layout`)
-- [ ] **Eleah:** Make the "No check-ins in the last 2 hours" message span the full width (`.checkin-grid > p`)
 
 ---
 

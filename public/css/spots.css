@@ -65,6 +65,30 @@ main > section + section {
   margin-top: var(--space-8);
 }
 
+/* Keep the map in view while scrolling the spot list */
+.spots-layout .map {
+  position: sticky;
+  top: var(--space-4);
+  align-self: start;
+}
+
+/* Filters: search on top, the other filters in one row */
+.filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+}
+
+.filters__row .field {
+  flex: 1 1 12rem;
+}
+
+.filters__row .field--checkbox {
+  flex: 0 0 auto;
+  padding-bottom: var(--space-3);
+}
+
 @media (max-width: 48rem) {
   .spots-layout {
     grid-template-columns: 1fr;
