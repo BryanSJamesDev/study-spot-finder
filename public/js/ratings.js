@@ -8,6 +8,8 @@ import {
   sortByAverage,
 } from "./ratingsUtils.js";
 
+import { confirmDelete } from "./confirmDialog.js";
+
 /** Global variables */
 // How many recent ratings to show at once
 const RECENT_LIMIT = 20;
@@ -309,9 +311,7 @@ async function handleSubmit(event) {
 async function deleteRating(rating) {
   // Ask if you're sure you want to delete
   if (
-    !confirm(
-      `Delete this ${rating.stars}-star rating for "${rating.spotName}"?`,
-    )
+    !(await confirmDelete(`${rating.stars}-star rating for ${rating.spotName}`))
   ) {
     return;
   }
