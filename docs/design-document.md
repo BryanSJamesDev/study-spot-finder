@@ -21,7 +21,7 @@ Study Spot Finder is a web app where Northeastern students share and find study 
 - **Rate spots** from 1 to 5 stars and see each spot's average rating.
 - **Check in** to report how crowded a spot is, and see how busy it is right now based on the last 2 hours of check-ins.
 - **Get recommendations** for similar spots, using a k-nearest neighbors algorithm that explains why each spot matched.
-- **See a crowd forecast** that predicts how busy a spot will be at each hour of a chosen day, based on past check-ins.
+- **See a crowd forecast** that predicts how busy a spot will be over the next few hours, based on past check-ins.
 
 ### Who it's for
 
@@ -80,9 +80,9 @@ Jordan's group met at the student center for their project. The tables were big 
 
 ### Story 4: Checking in and seeing the crowd forecast (Bryan)
 
-> As a student, I want to submit, edit, and delete a check-in that reports how crowded a spot is, see how crowded it is right now, and see how busy it's predicted to be at each hour, so that I can avoid crowded times.
+> As a student, I want to submit, edit, and delete a check-in that reports how crowded a spot is, see how crowded it is right now, and see how busy it's predicted to be over the next few hours, so that I can avoid crowded times.
 
-Jordan needs to book a group session for Thursday. On the Check-Ins page, he picks a spot and Thursday, and the hourly forecast shows it's busiest at noon and quieter at 9 a.m. He schedules the session for the morning. On Thursday, when the group arrives, he submits a quick check-in: "Not busy," with a note that the big tables by the window are open. Maya, checking the app across campus, sees that it's not crowded right now and decides to head over too.
+Jordan needs to book a group session for later today. On the Check-Ins page, he picks a spot and the forecast shows it's busy now but quieter over the next few hours. He schedules the session for later. When the group arrives, he submits a quick check-in: "Not busy," with a note that the big tables by the window are open. Maya, checking the app across campus, sees that it's not crowded right now and decides to head over too.
 
 ---
 
@@ -108,11 +108,11 @@ The main page for finding a spot. A search bar and filter chips (noise, outlets,
 
 ### Ratings
 
-Shows the top-rated spots with their average ratings. A form lets students pick a spot, choose 1 to 5 stars, and leave an optional review. Recent reviews appear next to the form.
+Shows the top-rated spots with their average ratings. A form lets students pick a spot and choose 1 to 5 stars. Recent ratings appear below the form, and students can filter them by spot.
 
 ### Check-Ins
 
-A form for reporting how crowded a spot is (Not busy, Moderate, or Very busy) with an optional note. Next to it, an hourly bar chart shows the crowd forecast for a chosen spot. Recent check-ins appear below.
+A form for reporting how crowded a spot is (Not busy, Moderate, or Very busy) with an optional note. Above it, cards show the crowd forecast for the next few hours at a chosen spot. Recent check-ins appear below.
 
 ### Mobile
 
@@ -310,16 +310,20 @@ Both algorithms are written from scratch in plain JavaScript, with no external l
 
 ### Crowd forecast (Bryan)
 
-**Goal:** For a chosen spot and day, predict how busy it will be at each hour.
+**Goal:** For a chosen spot, predict how busy it will be over the next few hours.
 
 **How it works:**
 
-1. **Gather past check-ins** for the chosen spot.
-2. **Weight each check-in by how close it is** to the day and hour being predicted. A check-in from the same day at the same hour counts the most. Check-ins from a different day, or a few hours away, still count, just less.
-3. **Take the weighted average** of the crowd levels for each hour. This gives a predicted crowd level for every hour of that day.
-4. **Show it as a bar chart,** with the busiest hour highlighted and a short written summary, like "Busiest at noon. Try 9 a.m. for a quieter start."
+1. **Gather past check-ins** for the chosen spot from the last 90 days.
+2. **Weight each check-in** by how relevant it is to the hour being predicted. The weight is the product of three parts:
+   - **Day:** a check-in from the same day of the week counts fully. A check-in from the same kind of day (weekday or weekend) counts less. A check-in from the other kind of day doesn't count.
+   - **Hour:** a check-in from the same hour counts fully, and the weight halves for each hour away (1 hour away counts half, 2 hours away counts a quarter). Check-ins more than 2 hours away don't count.
+   - **Recency:** newer check-ins count more. The weight halves for every 14 days of age.
+3. **Take the weighted average** of the crowd levels (Not busy = 1, Moderate = 2, Very busy = 3) and round it back to a crowd level for each upcoming hour.
+4. **Add a confidence level.** The more total weight an hour has behind it, the higher the confidence, shown as low, medium, or high. If no check-ins match, the app says "Not enough check-ins to forecast" instead of guessing.
+5. **Show the next 6 hours** as cards, starting at the current hour and rolling past midnight, each with a crowd badge and its confidence.
 
-**Why weighted:** A simple average would treat a Monday 9 a.m. check-in the same as a Friday 3 p.m. one. Weighting by closeness means the forecast reflects the real pattern for that time, while still using all the data when there aren't many check-ins yet.
+**Why weighted:** A simple average would treat a Monday 9 a.m. check-in the same as a Friday 3 p.m. one. Weighting by day, hour, and recency means the forecast reflects the real pattern for that time, favors up-to-date data, and still uses nearby check-ins when there aren't many yet.
 
 ---
 
