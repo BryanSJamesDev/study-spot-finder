@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check-Ins · Study Spot Finder</title>
+    <link rel="stylesheet" href="./css/shared.css" />
+    <link rel="stylesheet" href="./css/nav.css" />
+    <link rel="stylesheet" href="./css/checkins.css" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav__inner container">
+        <a href="index.html" class="nav__brand">
+          Study Spot Finder
+          <small class="text-muted">Northeastern University</small>
+        </a>
+        <ul class="nav__links">
+          <li>
+            <a href="index.html" class="nav__link">Home</a>
+          </li>
+          <li>
+            <a href="spots.html" class="nav__link">Spots</a>
+          </li>
+          <li><a href="ratings.html" class="nav__link">Ratings</a></li>
+          <li>
+            <a href="checkins.html" class="nav__link" aria-current="page"
+              >Check-Ins</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>See how busy it is.</h1>
+      <p>Check in at a spot to let other students know how crowded it is.</p>
+
+      <section>
+        <h2>Crowded right now</h2>
+        <p class="text-muted">Based on check-ins from the last 2 hours.</p>
+        <div id="crowded-list" class="checkin-grid"></div>
+      </section>
+
+      <section class="panel">
+        <h2 id="form-title">Check in</h2>
+        <form id="checkin-form" class="form">
+          <!-- Spot -->
+          <div class="field">
+            <label for="checkin-spot" class="field__label">Spot *</label>
+            <select id="checkin-spot" name="spotName" class="select" required>
+              <option value="">Choose a spot</option>
+            </select>
+          </div>
+
+          <!-- Crowd level -->
+          <div class="field">
+            <label for="checkin-crowd" class="field__label"
+              >How busy is it? *</label
+            >
+            <select
+              id="checkin-crowd"
+              name="crowdLevel"
+              class="select"
+              required
+            >
+              <option value="">Choose a crowd level</option>
+              <option value="Not busy">Not busy</option>
+              <option value="Moderate">Moderate</option>
+              <option value="Very busy">Very busy</option>
+            </select>
+          </div>
+
+          <!-- Note -->
+          <div class="field">
+            <label for="checkin-note" class="field__label">Note</label>
+            <textarea
+              id="checkin-note"
+              name="note"
+              class="input"
+              rows="3"
+              maxlength="200"
+              aria-describedby="checkin-note-hint"
+            ></textarea>
+            <p id="checkin-note-hint" class="field__hint">
+              Optional, up to 200 characters.
+            </p>
+          </div>
+
+          <!-- Form error message -->
+          <p id="form-error" class="field__error" role="alert"></p>
+
+          <!-- Form buttons -->
+          <div class="form__actions">
+            <!-- Submit button -->
+            <button type="submit" id="form-submit" class="btn btn--primary">
+              Check in
+            </button>
+
+            <!-- Cancel button hidden by default -->
+            <button
+              type="button"
+              id="form-cancel"
+              class="btn btn--secondary"
+              hidden
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section>
+        <h2>Recent check-ins</h2>
+        <div class="field">
+          <label for="filter-spot" class="field__label">Filter by spot</label>
+          <select id="filter-spot" class="select">
+            <option value="">All spots</option>
+          </select>
+        </div>
+        <div id="checkin-list" class="checkin-grid"></div>
+      </section>
+    </main>
+    <script type="module" src="./js/checkins.js"></script>
+  </body>
+</html>
