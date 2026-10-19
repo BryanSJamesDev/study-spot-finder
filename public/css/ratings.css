@@ -70,3 +70,11 @@
   outline: var(--focus-ring);
   outline-offset: 3px;
 }
+
+/* Grid of rating cards */
+.rating-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}

@@ -133,6 +133,10 @@ main {
   padding-block: var(--space-8) var(--space-12);
 }
 
+main > section + section {
+  margin-top: var(--space-8);
+}
+
 /* Primary and secondary buttons */
 .btn {
   display: inline-flex;
@@ -180,6 +184,19 @@ main {
 .form {
   display: grid;
   gap: var(--space-4);
+}
+
+.form .btn {
+  justify-self: start;
+}
+
+.btn[hidden] {
+  display: none;
+}
+
+.form__actions {
+  display: flex;
+  gap: var(--space-3);
 }
 
 .field {
