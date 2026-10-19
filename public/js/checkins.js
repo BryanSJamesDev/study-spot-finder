@@ -162,7 +162,7 @@ function createCheckinCard(checkin) {
   deleteButton.addEventListener("click", () => deleteCheckin(checkin));
 
   const actions = document.createElement("div");
-  actions.className = "form__actions";
+  actions.className = "card__actions";
   actions.append(editButton, deleteButton);
 
   card.append(actions);
