@@ -288,6 +288,143 @@ test("crowded-now returns an empty list with no recent check-ins", async () => {
   assert.deepEqual(body, []);
 });
 
+/** Test forecast needs a spot name. */
+test("forecast without a spot name returns 400", async () => {
+  for (const query of ["", "?spotName=", "?spotName=%20%20%20"]) {
+    const res = await fetch(`${baseUrl}/forecast${query}`);
+
+    assert.equal(res.status, 400);
+
+    const body = await res.json();
+    assert.equal(body.error, "Spot name is required");
+  }
+});
+
+/** Test invalid hours return a 400 status code. */
+test("forecast with invalid hours returns 400", async () => {
+  for (const hours of ["0", "-1", "abc", "3.5", "25", ""]) {
+    const res = await fetch(
+      `${baseUrl}/forecast?spotName=Test%20Spot&hours=${hours}`,
+    );
+
+    assert.equal(res.status, 400);
+
+    const body = await res.json();
+    assert.equal(body.error, "Hours must be a whole number from 1 to 24");
+  }
+});
+
+/** Test the highest allowed number of hours is accepted. */
+test("forecast of 24 hours is accepted", async () => {
+  const res = await fetch(`${baseUrl}/forecast?spotName=Test%20Spot&hours=24`);
+
+  assert.equal(res.status, 200);
+
+  const body = await res.json();
+  assert.equal(body.forecasts.length, 24);
+});
+
+/** Test a spot with no check-ins gets 6 empty forecasts by default. */
+test("forecast for a spot with no check-ins is empty", async () => {
+  const res = await fetch(
+    `${baseUrl}/forecast?spotName=${encodeURIComponent("Test Spot Nobody Visited")}`,
+  );
+
+  assert.equal(res.status, 200);
+
+  const body = await res.json();
+  assert.equal(body.spotName, "Test Spot Nobody Visited");
+  assert.equal(body.forecasts.length, 6);
+
+  for (const forecast of body.forecasts) {
+    assert.equal(forecast.level, null);
+    assert.equal(forecast.confidence, 0);
+    assert.equal(forecast.confidenceLabel, "low");
+  }
+});
+
+/** Test forecast only uses check-ins for the requested spot. */
+test("forecast uses check-ins for the requested spot only", async () => {
+  // Check-ins made right now land in the current campus day and hour
+  const { day, hour } = getCampusDayAndHour();
+  const { insertedIds } = await getDB()
+    .collection("checkins")
+    .insertMany([
+      validCheckin({
+        spotName: "Test Spot for Forecast",
+        crowdLevel: "Very busy",
+        day,
+        hour,
+        createdAt: new Date(),
+      }),
+      validCheckin({
+        spotName: "Test Spot for Forecast",
+        crowdLevel: "Very busy",
+        day,
+        hour,
+        createdAt: new Date(),
+      }),
+      validCheckin({
+        spotName: "Test Spot for Other Forecast",
+        crowdLevel: "Not busy",
+        day,
+        hour,
+        createdAt: new Date(),
+      }),
+    ]);
+  const ids = Object.values(insertedIds);
+
+  try {
+    const res = await fetch(
+      `${baseUrl}/forecast?spotName=${encodeURIComponent("Test Spot for Forecast")}&hours=1`,
+    );
+
+    assert.equal(res.status, 200);
+
+    const body = await res.json();
+    assert.equal(body.forecasts.length, 1);
+    assert.equal(body.forecasts[0].day, day);
+    assert.equal(body.forecasts[0].hour, hour);
+    assert.equal(body.forecasts[0].level, "Very busy");
+    assert.equal(body.forecasts[0].sampleSize, 2);
+    assert.equal(body.forecasts[0].confidenceLabel, "medium");
+  } finally {
+    await getDB()
+      .collection("checkins")
+      .deleteMany({ _id: { $in: ids } });
+  }
+});
+
+/** Test forecast ignores check-ins older than 90 days. */
+test("forecast ignores check-ins older than 90 days", async () => {
+  const { day, hour } = getCampusDayAndHour();
+  const { insertedId } = await getDB()
+    .collection("checkins")
+    .insertOne(
+      validCheckin({
+        spotName: "Test Spot for Old Forecast",
+        crowdLevel: "Very busy",
+        day,
+        hour,
+        createdAt: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000),
+      }),
+    );
+
+  try {
+    const res = await fetch(
+      `${baseUrl}/forecast?spotName=${encodeURIComponent("Test Spot for Old Forecast")}&hours=1`,
+    );
+
+    assert.equal(res.status, 200);
+
+    const body = await res.json();
+    assert.equal(body.forecasts[0].level, null);
+    assert.equal(body.forecasts[0].sampleSize, 0);
+  } finally {
+    await getDB().collection("checkins").deleteOne({ _id: insertedId });
+  }
+});
+
 /** Test a valid check-in returns 201, trims extra spaces, and adds createdAt. */
 test("valid check-in returns 201", async () => {
   const res = await postCheckin(
@@ -559,6 +696,22 @@ test("crowded-now returns 500 when the database fails", async () => {
 
     const body = await res.json();
     assert.equal(body.error, "Failed to load crowd levels");
+  } finally {
+    await connectDB();
+  }
+});
+
+/** Test that forecast returns a 500 status when the database fails. */
+test("forecast returns 500 when the database fails", async () => {
+  await closeDB();
+
+  try {
+    const res = await fetch(`${baseUrl}/forecast?spotName=Test%20Spot`);
+
+    assert.equal(res.status, 500);
+
+    const body = await res.json();
+    assert.equal(body.error, "Failed to load forecast");
   } finally {
     await connectDB();
   }
