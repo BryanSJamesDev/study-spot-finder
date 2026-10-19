@@ -303,8 +303,8 @@ Errors are returned as `{ "error": "message" }` with status `400` (bad input), `
 - [x] Publicly deployed
 - [ ] Narrated public demo video
 - [ ] Code review
-- [ ] README: authors, class link, objective, screenshot, build instructions
-- [ ] Code frozen 24 hours before class
+- [x] README: authors, class link, objective, screenshot, build instructions
+- [x] Code frozen 24 hours before class
 - [ ] Final submission form with thumbnail
 
 ---
@@ -349,7 +349,7 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 
 - [x] **Eleah:** Seed script for spots in `seed/`
 - [x] **Bryan:** Seed scripts for ratings and check-ins in `seed/` (enough for 1,000+ records total)
-- [ ] **Eleah:** Deploy and confirm the live site connects to MongoDB
+- [x] **Eleah:** Deploy and confirm the live site connects to MongoDB
 
 ### Phase 4: Map and Algorithms
 
@@ -364,10 +364,10 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 - [x] **Eleah:** Make the "No check-ins in the last 2 hours" message span the full width (`.checkin-grid > p`)
 - [x] **Eleah:** Add a hover style to the star rating
 - [x] **Eleah:** Add a favicon
-- [ ] **Bryan:** Switch Ratings and Check-Ins to the shared delete dialog
+- [x] **Bryan:** Switch Ratings and Check-Ins to the shared delete dialog
 - [ ] **Both:** Screenshot, deployed URL, and video link in README
 - [ ] **Both:** Narrated demo video
-- [ ] **Both:** Freeze code 24 hours before class
+- [x] **Both:** Freeze code 24 hours before class
 - [ ] **Both:** Submit the final form with thumbnail
 
 ---
