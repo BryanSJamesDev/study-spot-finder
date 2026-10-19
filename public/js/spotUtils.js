@@ -124,4 +124,28 @@ function filterSpots(spots, filters) {
   });
 }
 
-export { formatClosingTime, getSpotTags, parseTags, filterSpots };
+/** Formats match reason strings into a single dot-separated line */
+function formatMatchReasons(reasons) {
+  // Keep only non-empty string reasons if reasons is an array, then trim whitespace
+  const validReasons = Array.isArray(reasons)
+    ? reasons
+        .filter((reason) => typeof reason === "string" && reason.trim() !== "")
+        .map((reason) => reason.trim())
+    : [];
+
+  // Fallback to "Similar overall" if no specific reasons remain
+  if (validReasons.length === 0) {
+    return "Similar overall";
+  }
+
+  // Join valid reasons with a centered dot separator
+  return validReasons.join(" · ");
+}
+
+export {
+  formatClosingTime,
+  getSpotTags,
+  parseTags,
+  filterSpots,
+  formatMatchReasons,
+};

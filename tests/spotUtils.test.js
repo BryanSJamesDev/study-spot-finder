@@ -5,6 +5,7 @@ import {
   getSpotTags,
   parseTags,
   filterSpots,
+  formatMatchReasons,
 } from "../public/js/spotUtils.js";
 
 // Sample spots for filterSpots tests
@@ -385,4 +386,46 @@ test("filterSpots handles 10000 spots", () => {
 
   // Check that filtering for Quiet returns 5000 spots
   assert.equal(filterSpots(manySpots, { noiseLevel: "Quiet" }).length, 5000);
+});
+
+/** Test that normal reasons are joined with dots. */
+test("formatMatchReasons joins normal reasons with dots", () => {
+  assert.equal(
+    formatMatchReasons([
+      "Same noise level",
+      "Both have outlets",
+      "1 shared tag",
+    ]),
+    "Same noise level · Both have outlets · 1 shared tag",
+  );
+  assert.equal(formatMatchReasons(["Both have Wi-Fi"]), "Both have Wi-Fi");
+});
+
+/** Test that missing or invalid reasons fall back to Similar overall. */
+test("formatMatchReasons falls back to Similar overall", () => {
+  for (const input of [[], null, undefined, "Same noise level", {}]) {
+    assert.equal(formatMatchReasons(input), "Similar overall");
+  }
+});
+
+/** Test that bad items are skipped and spaces are trimmed. */
+test("formatMatchReasons skips bad items and trims spaces", () => {
+  assert.equal(
+    formatMatchReasons([
+      "Same noise level",
+      "",
+      "   ",
+      5,
+      null,
+      "  Both have outlets  ",
+    ]),
+    "Same noise level · Both have outlets",
+  );
+  assert.equal(formatMatchReasons(["", "   ", 5]), "Similar overall");
+});
+
+/** Test that a large number of reasons is handled. */
+test("formatMatchReasons handles lots of reasons", () => {
+  const result = formatMatchReasons(Array(100).fill("Shared"));
+  assert.equal(result.split(" · ").length, 100);
 });

@@ -3,6 +3,7 @@ import {
   getSpotTags,
   parseTags,
   filterSpots,
+  formatMatchReasons,
 } from "./spotUtils.js";
 
 import {
@@ -139,6 +140,9 @@ function createSpotCard(spot) {
   const card = document.createElement("article");
   card.className = "card";
 
+  // Give the card an ID so other cards can link to it
+  card.id = `spot-${spot._id}`;
+
   // Create the spot title
   const title = document.createElement("h3");
   title.className = "card__title";
@@ -177,6 +181,11 @@ function createSpotCard(spot) {
     card.append(tagList);
   }
 
+  // Create a hidden area to show similar spots
+  const similar = document.createElement("div");
+  similar.className = "card__similar";
+  similar.hidden = true;
+
   // Create a container for the card's buttons
   const actions = document.createElement("div");
   actions.className = "card__actions";
@@ -200,12 +209,89 @@ function createSpotCard(spot) {
   deleteButton.setAttribute("aria-label", `Delete ${spot.name}`);
   deleteButton.addEventListener("click", () => deleteSpot(spot));
 
-  // Add the delete button to the actions, and the actions to the card
+  // Add the delete button to the actions
   actions.append(deleteButton);
-  card.append(actions);
+
+  // Create the similar spots button
+  const similarButton = document.createElement("button");
+  similarButton.type = "button";
+  similarButton.className = "btn btn--secondary";
+  similarButton.textContent = "Spots like this";
+  similarButton.setAttribute("aria-label", `Spots like ${spot.name}`);
+  similarButton.addEventListener("click", () =>
+    toggleSimilarSpots(spot, similar, similarButton),
+  );
+
+  // Add the similar spots button to the actions
+  actions.append(similarButton);
+
+  // Add the actions and similar spots container to the card
+  card.append(actions, similar);
 
   // Return the completed card
   return card;
+}
+
+/** Shows or hides similar spots for a spot */
+async function toggleSimilarSpots(spot, container, button) {
+  // If the results are already open, hide them
+  if (!container.hidden) {
+    container.hidden = true;
+    button.textContent = "Spots like this";
+    return;
+  }
+
+  // Show the container and loading message
+  container.hidden = false;
+  container.textContent = "Loading...";
+  button.textContent = "Hide similar spots";
+
+  try {
+    // Fetch similar spots from the API
+    const res = await fetch(`/api/spots/${spot._id}/similar`);
+
+    // If the response is not ok, show an error message
+    if (!res.ok) {
+      container.textContent = "Couldn't load similar spots";
+      return;
+    }
+
+    // Read the similar spots from the response
+    const matches = await res.json();
+
+    // If there are no similar spots, show a message
+    if (matches.length === 0) {
+      container.textContent = "No similar spots yet";
+      return;
+    }
+
+    // Clear the loading message
+    container.replaceChildren();
+
+    // Add a heading for the similar spots
+    const heading = document.createElement("h4");
+    heading.textContent = "Spots like this";
+    container.appendChild(heading);
+
+    // Add each similar spot and its match reasons
+    for (const match of matches) {
+      const name = document.createElement("p");
+      const link = document.createElement("a");
+      link.href = `#spot-${match.spot._id}`;
+      link.textContent = match.spot.name;
+      name.appendChild(link);
+      container.appendChild(name);
+
+      const reasons = document.createElement("p");
+      reasons.className = "card__meta";
+      reasons.textContent = formatMatchReasons(match.reasons);
+      container.appendChild(reasons);
+    }
+  } catch (error) {
+    // Log the error and show a message
+    console.error("Failed to load similar spots", error);
+    container.textContent = "Couldn't load similar spots";
+  }
 }
 
 /** Displays all spot cards on the page */
@@ -262,6 +348,7 @@ async function handleSubmit(event) {
   // Update the spot being edited, or create a new one
   const url = editingId ? `/api/spots/${editingId}` : "/api/spots";
   const method = editingId ? "PUT" : "POST";
+
   try {
     // Send the new spot to the PUT or POST route
     const res = await fetch(url, {
