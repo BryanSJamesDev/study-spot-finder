@@ -7,6 +7,7 @@
     <link rel="icon" href="/favicon.ico" />
     <link rel="stylesheet" href="./css/shared.css" />
     <link rel="stylesheet" href="./css/nav.css" />
+    <link rel="stylesheet" href="/css/home.css" />
   </head>
   <body>
     <nav class="nav">
@@ -26,13 +27,69 @@
       </div>
     </nav>
     <main class="container">
-      <h1>Study Spot Finder</h1>
-      <p>
-        Find your next favorite study spot at Northeastern! Explore campus
-        locations, filter by your preferences, rate spots, and check in to share
-        how crowded they are. Get personalized recommendations and predictions
-        of how busy a spot will be, so you can find the right place to focus.
-      </p>
+      <section class="home-hero">
+        <div>
+          <p class="home-hero__eyebrow">Less searching. More studying.</p>
+          <h1>Find your next study spot.</h1>
+          <p>
+            A quiet corner, a group table, or a seat near an outlet. Find a
+            place on campus that fits the way you study.
+          </p>
+          <div class="home-hero__actions">
+            <a href="/spots.html" class="btn btn--primary"
+              >Explore study spots</a
+            >
+            <a href="/checkins.html" class="btn btn--secondary"
+              >Report a crowd level</a
+            >
+          </div>
+          <p class="text-muted">Built for students, with help from students.</p>
+        </div>
+        <img
+          src="/images/homepage.png"
+          alt="Students studying at wooden tables in a campus library"
+          class="home-hero__image"
+        />
+      </section>
+
+      <section>
+        <div class="home-section__header">
+          <h2>A few places to start</h2>
+          <a href="/spots.html">View all spots</a>
+        </div>
+        <div id="featured-spots" class="home-grid"></div>
+      </section>
+
+      <section>
+        <h2>Good study days start here</h2>
+        <div class="home-steps">
+          <div>
+            <h3>Find your fit</h3>
+            <p class="text-muted">
+              Filter by noise, outlets and Wi-Fi to find the right space.
+            </p>
+          </div>
+          <div>
+            <h3>Share your experience</h3>
+            <p class="text-muted">
+              Leave a 1 to 5 star rating to help the next student choose.
+            </p>
+          </div>
+          <div>
+            <h3>Check in, help out</h3>
+            <p class="text-muted">
+              Report the crowd level so others know how busy it is.
+            </p>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <footer class="home-footer">
+      <p>Made for Northeastern students. A student class project.</p>
+      <p>Sample data. Not affiliated with the university.</p>
+    </footer>
+
+    <script type="module" src="/js/home.js"></script>
   </body>
 </html>

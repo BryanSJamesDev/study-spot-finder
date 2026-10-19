@@ -173,6 +173,15 @@ main > section + section {
   color: var(--color-on-primary);
 }
 
+a:not(.btn):hover {
+  color: var(--color-primary-hover);
+}
+
+.btn--primary:hover {
+  background: var(--color-primary-hover);
+  color: var(--color-surface);
+}
+
 .btn--primary:hover:not(:disabled) {
   background: var(--color-primary-hover);
 }

@@ -1,0 +1,75 @@
+/* Hero: text on the left, photo on the right */
+.home-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+.home-hero__eyebrow {
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.home-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.home-hero__actions .btn {
+  text-decoration: none;
+}
+
+.home-hero__image {
+  width: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.home-hero + section {
+  margin-top: var(--space-8);
+}
+
+/* Section title with a link on the right */
+.home-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+
+/* Featured spot cards */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+
+/* Three steps in a row */
+.home-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+.home-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  max-width: 72rem;
+  margin: var(--space-8) auto 0;
+  padding: var(--space-4);
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 48rem) {
+  .home-hero,
+  .home-steps {
+    grid-template-columns: 1fr;
+  }
+}
