@@ -7,6 +7,7 @@ import {
   scoreToCrowd,
   getCampusDayAndHour,
 } from "../ml/crowd.js";
+import { forecastNextHours, confidenceLabel } from "../ml/forecast.js";
 
 // Create a router to handle requests related to check-ins
 const checkinsRouter = express.Router();
@@ -20,6 +21,15 @@ const MAX_LIMIT = 100;
 
 // "Crowded now" looks at check-ins from the last 2 hours
 const CROWDED_NOW_WINDOW_MS = 2 * 60 * 60 * 1000;
+
+// Forecasts start with 6 hours unless the request asks for a different number
+const DEFAULT_FORECAST_HOURS = 6;
+
+// Most hours one forecast request can ask for
+const MAX_FORECAST_HOURS = 24;
+
+// Forecasts only learn from check-ins made in the last 90 days
+const FORECAST_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 
 /** HELPER FUNCTIONS */
 // Helper function that takes check-in data and returns a list of error messages
@@ -163,6 +173,64 @@ checkinsRouter.get("/crowded-now", async (req, res) => {
 
     // Return a 500 status code to indicate a server error
     res.status(500).json({ error: "Failed to load crowd levels" });
+  }
+});
+
+// Handle GET requests to /api/checkins/forecast which predicts how busy one spot will be over the next few hours
+// Example: /api/checkins/forecast?spotName=Snell Quiet Floor&hours=6
+// Like /crowded-now, this has to stay above /:id so "forecast" is not treated as a check-in ID.
+checkinsRouter.get("/forecast", async (req, res) => {
+  // A forecast is for one spot, so a spot name is required
+  const spotName =
+    typeof req.query.spotName === "string" ? req.query.spotName.trim() : "";
+
+  if (spotName === "") {
+    return res.status(400).json({ error: "Spot name is required" });
+  }
+
+  // Check that hours is a whole number from 1 to 24 if provided
+  let hours = DEFAULT_FORECAST_HOURS;
+
+  if (req.query.hours !== undefined) {
+    const rawHours = req.query.hours;
+    hours =
+      typeof rawHours === "string" && /^\d+$/.test(rawHours)
+        ? Number(rawHours)
+        : NaN;
+
+    if (!(hours >= 1 && hours <= MAX_FORECAST_HOURS)) {
+      return res
+        .status(400)
+        .json({ error: "Hours must be a whole number from 1 to 24" });
+    }
+  }
+
+  try {
+    // Only use this spot's check-ins from the last 90 days
+    const checkins = await getDB()
+      .collection("checkins")
+      .find({
+        spotName,
+        createdAt: { $gte: new Date(Date.now() - FORECAST_LOOKBACK_MS) },
+      })
+      .toArray();
+
+    // Forecast each of the next few hours and add a word for the confidence
+    const forecasts = forecastNextHours(checkins, { hours }).map(
+      (forecast) => ({
+        ...forecast,
+        confidenceLabel: confidenceLabel(forecast.confidence),
+      }),
+    );
+
+    // Send the forecast back as a JSON response
+    res.json({ spotName, forecasts });
+  } catch (error) {
+    // Log the error if computing the forecast fails
+    console.error("Failed to load forecast", error);
+
+    // Return a 500 status code to indicate a server error
+    res.status(500).json({ error: "Failed to load forecast" });
   }
 });
 
