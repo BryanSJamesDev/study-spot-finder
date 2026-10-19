@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ratings · Study Spot Finder</title>
+    <link rel="stylesheet" href="./css/shared.css" />
+    <link rel="stylesheet" href="./css/nav.css" />
+    <link rel="stylesheet" href="./css/ratings.css" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav__inner container">
+        <a href="index.html" class="nav__brand">
+          Study Spot Finder
+          <small class="text-muted">Northeastern University</small>
+        </a>
+        <ul class="nav__links">
+          <li><a href="index.html" class="nav__link">Home</a></li>
+          <li><a href="spots.html" class="nav__link">Spots</a></li>
+          <li>
+            <a href="ratings.html" class="nav__link" aria-current="page"
+              >Ratings</a
+            >
+          </li>
+          <li><a href="checkins.html" class="nav__link">Check-Ins</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="container">
+      <h1>See how spots stack up.</h1>
+      <p>See the top-rated spots, then add your own rating.</p>
+
+      <section>
+        <h2>Campus favorites</h2>
+        <div id="average-list" class="rating-grid"></div>
+      </section>
+
+      <section class="panel">
+        <h2 id="form-title">Rate a spot</h2>
+        <form id="rating-form" class="form">
+          <!-- Spot -->
+          <div class="field">
+            <label for="rating-spot" class="field__label">Spot *</label>
+            <select id="rating-spot" name="spotName" class="select" required>
+              <option value="">Choose a spot</option>
+            </select>
+          </div>
+
+          <!-- Stars -->
+          <fieldset class="star-rating">
+            <legend>Your rating *</legend>
+            <div class="star-rating__options">
+              <label class="star-rating__option">
+                <input
+                  type="radio"
+                  name="stars"
+                  value="1"
+                  aria-label="1 star"
+                  required
+                />
+                <span aria-hidden="true">1 ★</span>
+              </label>
+              <label class="star-rating__option">
+                <input
+                  type="radio"
+                  name="stars"
+                  value="2"
+                  aria-label="2 stars"
+                  required
+                />
+                <span aria-hidden="true">2 ★</span>
+              </label>
+              <label class="star-rating__option">
+                <input
+                  type="radio"
+                  name="stars"
+                  value="3"
+                  aria-label="3 stars"
+                  required
+                />
+                <span aria-hidden="true">3 ★</span>
+              </label>
+              <label class="star-rating__option">
+                <input
+                  type="radio"
+                  name="stars"
+                  value="4"
+                  aria-label="4 stars"
+                  required
+                />
+                <span aria-hidden="true">4 ★</span>
+              </label>
+              <label class="star-rating__option">
+                <input
+                  type="radio"
+                  name="stars"
+                  value="5"
+                  aria-label="5 stars"
+                  required
+                />
+                <span aria-hidden="true">5 ★</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Form error message -->
+          <p id="form-error" class="field__error" role="alert"></p>
+
+          <!-- Form buttons -->
+          <div class="form__actions">
+            <button type="submit" id="form-submit" class="btn btn--primary">
+              Save rating
+            </button>
+
+            <!-- Cancel button hidden by default -->
+            <button
+              type="button"
+              id="form-cancel"
+              class="btn btn--secondary"
+              hidden
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section>
+        <h2>Recent ratings</h2>
+        <div class="field">
+          <label for="filter-spot" class="field__label">Show ratings for</label>
+          <select id="filter-spot" class="select">
+            <option value="">All spots</option>
+          </select>
+        </div>
+        <div id="rating-list" class="rating-grid"></div>
+      </section>
+    </main>
+    <script type="module" src="./js/ratings.js"></script>
+  </body>
+</html>
