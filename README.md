@@ -306,27 +306,27 @@ Must-haves come first. The map and algorithms come after the core app is deploye
 - [x] **Eleah:** Route tests in `tests/spots.test.js`
 - [x] **Bryan:** `ratings` CRUD routes and average rating in `routes/ratings.js`
 - [x] **Bryan:** Route tests in `tests/ratings.test.js`
-- [ ] **Bryan:** `checkins` CRUD routes and "crowded now" (last 2 hours) in `routes/checkins.js`, plus tests
+- [x] **Bryan:** `checkins` CRUD routes and "crowded now" (last 2 hours) in `routes/checkins.js`, plus tests
 
 ### Phase 2: Frontend (client-side rendering)
 
 - [x] **Eleah:** `spots.html` and `js/spots.js`: fetch from `/api/spots`, render cards, add/edit/delete form
 - [x] **Eleah:** `js/spotUtils.js` helpers with tests in `tests/spotUtils.test.js`
 - [x] **Eleah:** Filters on the Spots page (noise, outlets, Wi-Fi, tags)
-- [ ] **Bryan:** `ratings.html` and `js/ratings.js`: star rating UI, average rating, spot dropdown
-- [ ] **Bryan:** `checkins.html` and `js/checkins.js`: check-in form, "crowded now"
+- [x] **Bryan:** `ratings.html` and `js/ratings.js`: star rating UI, average rating, spot dropdown
+- [x] **Bryan:** `checkins.html` and `js/checkins.js`: check-in form, "crowded now"
 
 ### Phase 3: Data and Deployment
 
 - [x] **Eleah:** Seed script for spots in `seed/`
-- [ ] **Bryan:** Seed scripts for ratings and check-ins in `seed/` (enough for 1,000+ records total)
+- [x] **Bryan:** Seed scripts for ratings and check-ins in `seed/` (enough for 1,000+ records total)
 - [ ] **Eleah:** Deploy and confirm the live site connects to MongoDB
 
 ### Phase 4: Map and Algorithms
 
 - [x] **Eleah:** Leaflet map limited to campus bounds, with click-to-set location
 - [x] **Eleah:** KNN recommender in `ml/knn.js` with explanations, plus tests
-- [ ] **Bryan:** Weighted forecast in `ml/forecast.js`, plus tests
+- [x] **Bryan:** Weighted forecast in `ml/forecast.js`, plus tests
 
 ### Phase 5: Submission
 
