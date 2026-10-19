@@ -6,7 +6,7 @@ Find study spots on Northeastern's campus that match how you study.
 **Class:** [CS5610 Web Development](https://johnguerra.co/classes/webDevelopment_online_fall_2026/), Northeastern University
 **Stack:** Node.js, Express, Vanilla ES6, MongoDB (Node driver), Leaflet with OpenStreetMap
 **Design:** [Figma file](https://www.figma.com/design/gAZKaGijIlob4iAr49KcYV/Untitled)
-**Design document:** [docs/design-document.md](docs/design-document.md)
+**Design document:** [Design Document (PDF)](docs/design-document.pdf) · [Markdown version](docs/design-document.md)
 **Deployed site:** https://study-spot-finder.onrender.com
 **Demo video:** _coming soon_
 
