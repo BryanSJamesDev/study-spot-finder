@@ -14,6 +14,8 @@ import {
   clearSelectedLocation,
 } from "./map.js";
 
+import { confirmDelete } from "./confirmDialog.js";
+
 /** Global variables */
 // The ID of the spot being edited, or null when adding a new spot
 let editingId = null;
@@ -383,7 +385,7 @@ async function handleSubmit(event) {
 /** Handle the delete button */
 async function deleteSpot(spot) {
   // Ask if you're sure you want to delete
-  if (!confirm(`Delete "${spot.name}"?`)) {
+  if (!(await confirmDelete(spot.name))) {
     return;
   }
 
