@@ -78,3 +78,8 @@
   gap: var(--space-4);
   margin-top: var(--space-4);
 }
+
+.star-rating__option:hover span {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
