@@ -430,4 +430,4 @@ Seed scripts are safe to run more than once. "Crowded now" only counts check-ins
 
 ### License
 
-[MIT](LICENSE)
+[MIT](../LICENSE)
